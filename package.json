@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/snapdao/btcsnap"
   },
-  "license": "MIT-0",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -20,8 +20,7 @@
     "rebuild": "yarn build:tx && yarn build:snap && yarn test:snap",
     "test:snap": "mm-snap serve",
     "build:snap": "rm -rf build && mm-snap build",
-    "build:tx": "rm -rf dist && tsdx build",
-    "test": "jest --watchAll=false"
+    "build:tx": "rm -rf dist && tsdx build"
   },
   "dependencies": {
     "@metamask/snaps-ui": "^0.32.2",
@@ -43,7 +42,8 @@
     "@types/node": "^20.8.10",
     "@types/through2": "^2.0.40",
     "prettier": "^2.7.1",
-    "through2": "^4.0.2"
+    "through2": "^4.0.2",
+    "tsdx": "^0.14.1"
   },
   "packageManager": "yarn@3.2.1",
   "engines": {

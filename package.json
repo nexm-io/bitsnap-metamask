@@ -1,0 +1,56 @@
+{
+  "name": "snap",
+  "version": "0.1.0",
+  "description": "Metamask snap to manage your bitcoin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snapdao/btcsnap"
+  },
+  "license": "MIT-0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/bundle.js",
+    "images/icon.svg",
+    "snap.manifest.json"
+  ],
+  "scripts": {
+    "start": "mm-snap watch",
+    "build": "yarn build:tx && yarn build:snap",
+    "rebuild": "yarn build:tx && yarn build:snap && yarn test:snap",
+    "test:snap": "mm-snap serve",
+    "build:snap": "rm -rf build && mm-snap build",
+    "build:tx": "rm -rf dist && tsdx build",
+    "test": "jest --watchAll=false"
+  },
+  "dependencies": {
+    "@metamask/snaps-ui": "^0.32.2",
+    "bip32": "^2.0.6",
+    "bitcoinjs-lib": "^6.0.1",
+    "bitcoinjs-message": "^2.2.0",
+    "bn.js": "^5.2.1",
+    "bs58check": "^2.1.2",
+    "buffer": "^6.0.3",
+    "crypto-js": "^4.1.1",
+    "light-bolt11-decoder": "^2.1.0",
+    "secp256k1": "^5.0.0"
+  },
+  "devDependencies": {
+    "@metamask/snaps-cli": "^3.0.1",
+    "@types/bs58check": "^2.1.0",
+    "@types/create-hash": "^1.2.2",
+    "@types/crypto-js": "^4.1.1",
+    "@types/node": "^20.8.10",
+    "@types/through2": "^2.0.40",
+    "prettier": "^2.7.1",
+    "through2": "^4.0.2"
+  },
+  "packageManager": "yarn@3.2.1",
+  "engines": {
+    "node": ">=18.6.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

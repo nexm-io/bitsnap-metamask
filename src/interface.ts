@@ -1,39 +1,70 @@
-export interface GetPublicExtendedKeyRequest {
-  method: 'btc_getPublicExtendedKey';
-  params: {
-    network: BitcoinNetwork;
-    scriptType: ScriptType;
-  };
-}
-
-export interface GetAllXpubsRequest {
-  method: 'btc_getAllXpubs';
-  params: Record<string, never>
-}
-
 export interface SignPsbt {
-  method: 'btc_signPsbt';
+  method: "btc_signPsbt";
   params: {
     psbt: string;
-    network: BitcoinNetwork;
-    scriptType: ScriptType;
   };
-}
-
-export interface GetMasterFingerprint {
-  method: 'btc_getMasterFingerprint';
 }
 
 export interface ManageNetwork {
-  method: 'btc_network';
+  method: "btc_network";
   params: {
-    action: 'get' | 'set';
+    action: "get" | "set";
     network?: BitcoinNetwork;
   };
 }
 
+export interface Connect {
+  method: "btc_connect";
+  params: {
+    address: string;
+    network?: BitcoinNetwork;
+  };
+}
+
+export interface Disconnect {
+  method: "btc_disconnect";
+  params: {
+    address: string;
+    network?: BitcoinNetwork;
+  };
+}
+
+export interface IsConnected {
+  method: "btc_isConnected";
+  params: {
+    address: string;
+    network?: BitcoinNetwork;
+  };
+}
+
+export interface GetAccounts {
+  method: "btc_getAccounts";
+}
+
+export interface GetCurrentAccount {
+  method: "btc_getCurrentAccount";
+}
+
+export interface AddAccount {
+  method: "btc_addAccount";
+  params: {
+    scriptType: ScriptType;
+    index: number;
+  };
+}
+
+export interface SwitchAccount {
+  method: "btc_switchAccount";
+  params: {
+    scriptType: ScriptType;
+    index: number;
+    address: string;
+    mfp: string;
+  };
+}
+
 export interface SaveLNDataToSnap {
-  method: 'btc_saveLNDataToSnap';
+  method: "btc_saveLNDataToSnap";
   params: {
     walletId: string;
     credential: string;
@@ -42,26 +73,30 @@ export interface SaveLNDataToSnap {
 }
 
 export interface GetLNDataFromSnap {
-  method: 'btc_getLNDataFromSnap';
+  method: "btc_getLNDataFromSnap";
   params: {
     key: KeyOptions;
     walletId?: string;
-    type?: 'get' | 'refresh'
+    type?: "get" | "refresh";
   };
 }
 
 export interface SignLNInvoice {
-  method: 'btc_signLNInvoice';
+  method: "btc_signLNInvoice";
   params: {
     invoice: string;
   };
 }
 
 export type MetamaskBTCRpcRequest =
-  | GetAllXpubsRequest
-  | GetPublicExtendedKeyRequest
+  | Connect
+  | Disconnect
+  | IsConnected
+  | GetAccounts
+  | GetCurrentAccount
+  | AddAccount
+  | SwitchAccount
   | SignPsbt
-  | GetMasterFingerprint
   | ManageNetwork
   | SaveLNDataToSnap
   | GetLNDataFromSnap
@@ -69,7 +104,7 @@ export type MetamaskBTCRpcRequest =
 
 export type BTCMethodCallback = (
   originString: string,
-  requestObject: MetamaskBTCRpcRequest,
+  requestObject: MetamaskBTCRpcRequest
 ) => Promise<unknown>;
 
 export interface Snap {
@@ -81,27 +116,50 @@ export interface Snap {
 }
 
 export enum ScriptType {
-  P2PKH = 'P2PKH',
-  P2SH_P2WPKH = 'P2SH-P2WPKH',
-  P2WPKH = 'P2WPKH',
+  P2PKH = "P2PKH",
+  P2SH_P2WPKH = "P2SH-P2WPKH",
+  P2WPKH = "P2WPKH",
 }
 
 export enum BitcoinNetwork {
-  Main = 'main',
-  Test = 'test',
+  Main = "main",
+  Test = "test",
 }
+
+export interface ConnectedOrigin {
+  [origin: string]: {
+    [network in BitcoinNetwork]: string[]; // connected pubkeys
+  };
+}
+
+export interface BitcoinAccount {
+  scriptType: ScriptType;
+  index: number;
+  pubKey: string;
+  address: string;
+  mfp: string;
+}
+
+export type BitcoinAccounts = {
+  [network in BitcoinNetwork]: {
+    [pubKey: string]: BitcoinAccount;
+  };
+};
 
 export enum KeyOptions {
-  Password = 'password',
-  Credential = 'credential',
-  PubKey = 'pubkey',
+  Password = "password",
+  Credential = "credential",
+  PubKey = "pubkey",
 }
 
-const LightningAccount = Buffer.from('Lightning').readInt32BE();
+const LightningAccount = Buffer.from("Lightning").readInt32BE();
 export const LNHdPath = `m/84'/0'/${LightningAccount}'/0/0`;
 
 export interface PersistedData {
   network?: BitcoinNetwork;
+  origins: ConnectedOrigin;
+  accounts: BitcoinAccounts;
+  currentAccount?: BitcoinAccount;
   lightning?: {
     [walletId: string]: {
       credential: string;
@@ -150,5 +208,5 @@ export interface SLIP10Node {
   /**
    * The name of the curve used by the node.
    */
-  readonly curve: 'ed25519' | 'secp256k1';
+  readonly curve: "ed25519" | "secp256k1";
 }

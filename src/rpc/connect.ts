@@ -13,7 +13,7 @@ export async function connect(
     "origins",
     {}
   );
-  if (isConnected(origin, snap, address, target)) {
+  if (await isConnected(origin, snap, address, target)) {
     return true;
   }
 
@@ -30,6 +30,12 @@ export async function connect(
     },
   });
   if (result) {
+    if (!connectedOrigins[origin]) {
+      connectedOrigins[origin] = {
+        [BitcoinNetwork.Main]: [],
+        [BitcoinNetwork.Test]: [],
+      };
+    }
     connectedOrigins[origin][target].push(address);
     await updatePersistedData(snap, "origins", connectedOrigins);
     return true;
@@ -87,5 +93,8 @@ export async function isConnected(
     "origins",
     {}
   );
-  return connectedOrigins[origin][network].includes(address);
+  if (connectedOrigins[origin] && connectedOrigins[origin][network]) {
+    return connectedOrigins[origin][network].includes(address);
+  }
+  return false;
 }

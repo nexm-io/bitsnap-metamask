@@ -19,8 +19,12 @@ const DEFAULT_BITCOIN_ACCOUNTS = {
   [BitcoinNetwork.Test]: {},
 };
 
-export async function getAccounts(snap: Snap): Promise<BitcoinAccount[]> {
-  const snapNetwork: BitcoinNetwork = await getCurrentNetwork(snap);
+export async function getAccounts(
+  snap: Snap,
+  _network?: BitcoinNetwork
+): Promise<BitcoinAccount[]> {
+  const snapNetwork: BitcoinNetwork =
+    _network ?? (await getCurrentNetwork(snap));
   const accounts = await getPersistedData<BitcoinAccounts>(
     snap,
     "accounts",
@@ -49,6 +53,7 @@ export async function getAccounts(snap: Snap): Promise<BitcoinAccount[]> {
       pubKey: account.publicKey.toString("hex"),
       address,
       mfp: mfp,
+      network: snapNetwork,
     };
 
     accounts[snapNetwork][address] = defaultAccount;
@@ -86,6 +91,7 @@ export async function addAccount(
     pubKey: account.publicKey.toString("hex"),
     address,
     mfp: mfp,
+    network: snapNetwork,
   };
   if (accounts[snapNetwork][address]) {
     throw SnapError.of(RequestErrors.AccountExisted);

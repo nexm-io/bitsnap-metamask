@@ -55,6 +55,8 @@ Serverless
     - BTC_LEGACY (BTC_TESTNET_LEGACY)                       <=> P2PKH - BIP44
     - BTC_SEGWIT (BTC_TESTNET_SEGWIT)                       <=> P2SH_P2WPKH - BIP49
     - BTC_NATIVE_SEGWIT (BTC_TESTNET_NATIVE_SEGWIT)         <=> P2WPKH - BIP84
+- UTXO:
+    - Unspent Transaction Outputs
 
 ## btc_getAllXpubs
 

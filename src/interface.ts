@@ -136,6 +136,7 @@ export interface BitcoinAccount {
   scriptType: ScriptType;
   index: number;
   pubKey: string;
+  network: BitcoinNetwork;
   address: string;
   mfp: string;
 }

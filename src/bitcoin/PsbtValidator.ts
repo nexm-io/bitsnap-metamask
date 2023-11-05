@@ -1,8 +1,8 @@
-import { Psbt } from 'bitcoinjs-lib';
-import { AccountSigner } from './index';
-import { BitcoinNetwork } from '../interface';
-import { PsbtHelper } from '../bitcoin/PsbtHelper';
-import { fromHdPathToObj } from './cryptoPath';
+import { Psbt } from "bitcoinjs-lib";
+import { AccountSigner } from "./index";
+import { BitcoinNetwork } from "../interface";
+import { PsbtHelper } from "../bitcoin/PsbtHelper";
+import { fromHdPathToObj } from "./cryptoPath";
 import { PsbtValidateErrors, SnapError } from "../errors";
 
 const BITCOIN_MAINNET_COIN_TYPE = 0;
@@ -23,57 +23,41 @@ export class PsbtValidator {
     this.psbtHelper = new PsbtHelper(this.tx, network);
   }
 
-  get coinType(){
-    return this.snapNetwork === BitcoinNetwork.Main ? BITCOIN_MAINNET_COIN_TYPE: BITCOIN_TESTNET_COIN_TYPE;
+  get coinType() {
+    return this.snapNetwork === BitcoinNetwork.Main
+      ? BITCOIN_MAINNET_COIN_TYPE
+      : BITCOIN_TESTNET_COIN_TYPE;
   }
 
   allInputsHaveRawTxHex() {
-    const result = this.tx.data.inputs.every((input, index) => !!input.nonWitnessUtxo);
+    const result = this.tx.data.inputs.every(
+      (input, index) => !!input.nonWitnessUtxo
+    );
     if (!result) {
       this.error = SnapError.of(PsbtValidateErrors.InputsDataInsufficient);
     }
     return result;
   }
 
-  everyInputMatchesNetwork() {
-    const result = this.tx.data.inputs.every(input =>
-      input.bip32Derivation.every(derivation => {
-        const {coinType} = fromHdPathToObj(derivation.path)
-        return Number(coinType) === this.coinType
-      })
-    )
-    if (!result) {
-      this.error = SnapError.of(PsbtValidateErrors.InputsNetworkNotMatch);
-    }
-    return result;
-  }
-
   everyOutputMatchesNetwork() {
-    const addressPattern = this.snapNetwork === BitcoinNetwork.Main ? BITCOIN_MAIN_NET_ADDRESS_PATTERN : BITCOIN_TEST_NET_ADDRESS_PATTERN;
+    const addressPattern =
+      this.snapNetwork === BitcoinNetwork.Main
+        ? BITCOIN_MAIN_NET_ADDRESS_PATTERN
+        : BITCOIN_TEST_NET_ADDRESS_PATTERN;
     const result = this.tx.data.outputs.every((output, index) => {
-     if(output.bip32Derivation){
-       return output.bip32Derivation.every(derivation => {
-         const {coinType} = fromHdPathToObj(derivation.path)
-         return Number(coinType) === this.coinType
-       })
-     } else {
-       const address = this.tx.txOutputs[index].address;
-       return addressPattern.test(address);
-     }
-    })
+      if (output.bip32Derivation) {
+        return output.bip32Derivation.every((derivation) => {
+          const { coinType } = fromHdPathToObj(derivation.path);
+          return Number(coinType) === this.coinType;
+        });
+      } else {
+        const address = this.tx.txOutputs[index].address;
+        return addressPattern.test(address);
+      }
+    });
 
     if (!result) {
       this.error = SnapError.of(PsbtValidateErrors.OutputsNetworkNotMatch);
-    }
-    return result;
-  }
-
-  allInputsBelongToCurrentAccount(accountSigner: AccountSigner) {
-    const result = this.tx.txInputs.every((_, index) =>
-      this.tx.inputHasHDKey(index, accountSigner),
-    );
-    if (!result) {
-      this.error = SnapError.of(PsbtValidateErrors.InputNotSpendable);
     }
     return result;
   }
@@ -100,7 +84,9 @@ export class PsbtValidator {
   }
 
   witnessUtxoValueMatchesNoneWitnessOnes() {
-    const hasWitnessUtxo = this.tx.data.inputs.some((_, index) => this.tx.getInputType(index) === "witnesspubkeyhash");
+    const hasWitnessUtxo = this.tx.data.inputs.some(
+      (_, index) => this.tx.getInputType(index) === "witnesspubkeyhash"
+    );
     if (!hasWitnessUtxo) {
       return true;
     }
@@ -120,15 +106,13 @@ export class PsbtValidator {
     this.error = null;
 
     this.allInputsHaveRawTxHex() &&
-    this.everyInputMatchesNetwork() &&
-    this.everyOutputMatchesNetwork() &&
-    this.allInputsBelongToCurrentAccount(accountSigner) &&
-    this.changeAddressBelongsToCurrentAccount(accountSigner) &&
-    this.feeUnderThreshold() &&
-    this.witnessUtxoValueMatchesNoneWitnessOnes();
+      this.everyOutputMatchesNetwork() &&
+      this.changeAddressBelongsToCurrentAccount(accountSigner) &&
+      this.feeUnderThreshold() &&
+      this.witnessUtxoValueMatchesNoneWitnessOnes();
 
     if (this.error) {
-      throw this.error
+      throw this.error;
     }
     return true;
   }

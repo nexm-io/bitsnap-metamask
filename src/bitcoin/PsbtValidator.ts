@@ -62,19 +62,6 @@ export class PsbtValidator {
     return result;
   }
 
-  changeAddressBelongsToCurrentAccount(accountSigner: AccountSigner) {
-    const result = this.tx.data.outputs.every((output, index) => {
-      if (output.bip32Derivation) {
-        return this.tx.outputHasHDKey(index, accountSigner);
-      }
-      return true;
-    });
-    if (!result) {
-      this.error = SnapError.of(PsbtValidateErrors.ChangeAddressInvalid);
-    }
-    return result;
-  }
-
   feeUnderThreshold() {
     const result = this.psbtHelper.fee < PsbtValidator.FEE_THRESHOLD;
     if (!result) {
@@ -102,12 +89,11 @@ export class PsbtValidator {
     return result;
   }
 
-  validate(accountSigner: AccountSigner) {
+  validate() {
     this.error = null;
 
     this.allInputsHaveRawTxHex() &&
       this.everyOutputMatchesNetwork() &&
-      this.changeAddressBelongsToCurrentAccount(accountSigner) &&
       this.feeUnderThreshold() &&
       this.witnessUtxoValueMatchesNoneWitnessOnes();
 

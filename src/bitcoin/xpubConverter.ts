@@ -19,16 +19,20 @@ const scriptTypeToXpubPrefix: Record<
   Record<BitcoinNetwork, XpubPrefix>
 > = {
   [ScriptType.P2PKH]: {
-    main: "xpub",
-    test: "tpub",
+    [BitcoinNetwork.Main]: "xpub",
+    [BitcoinNetwork.Test]: "tpub",
   },
   [ScriptType.P2SH_P2WPKH]: {
-    main: "ypub",
-    test: "upub",
+    [BitcoinNetwork.Main]: "ypub",
+    [BitcoinNetwork.Test]: "upub",
   },
   [ScriptType.P2WPKH]: {
-    main: "zpub",
-    test: "vpub",
+    [BitcoinNetwork.Main]: "zpub",
+    [BitcoinNetwork.Test]: "vpub",
+  },
+  [ScriptType.P2TR]: {
+    [BitcoinNetwork.Main]: "zpub",
+    [BitcoinNetwork.Test]: "vpub",
   },
 };
 
@@ -46,6 +50,9 @@ export const convertXpub = (
   data = Buffer.concat([Buffer.from(xpubPrefixes[xpubPrefix], "hex"), data]);
   return encode(data);
 };
+
+export const toXOnly = (pubKey: Buffer) =>
+  pubKey.length === 32 ? pubKey : pubKey.slice(1, 33);
 
 export const deriveAddress = (
   publicKey: Buffer,
@@ -66,6 +73,14 @@ export const deriveAddress = (
     case ScriptType.P2WPKH:
       address = payments.p2wpkh({
         pubkey: publicKey,
+        network: network,
+      }).address;
+      break;
+    case ScriptType.P2TR:
+      // Since internalKey is an xOnly pubkey, we drop the DER header byte
+      const xOnlyPubkey = toXOnly(publicKey);
+      address = payments.p2tr({
+        pubkey: xOnlyPubkey,
         network: network,
       }).address;
       break;

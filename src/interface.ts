@@ -49,7 +49,6 @@ export interface AddAccount {
   method: "btc_addAccount";
   params: {
     scriptType: ScriptType;
-    index: number;
   };
 }
 
@@ -119,31 +118,26 @@ export enum ScriptType {
   P2PKH = "P2PKH",
   P2SH_P2WPKH = "P2SH-P2WPKH",
   P2WPKH = "P2WPKH",
+  P2TR = "P2TR",
 }
 
 export enum BitcoinNetwork {
-  Main = "main",
-  Test = "test",
+  Main = "mainnet",
+  Test = "testnet",
 }
 
-export interface ConnectedOrigin {
-  [origin: string]: {
-    [network in BitcoinNetwork]: string[]; // connected pubkeys
-  };
-}
-
-export interface BitcoinAccount {
-  scriptType: ScriptType;
-  index: number;
+export type BitcoinAccount = {
+  derivationPath: string[];
   pubKey: string;
-  network: BitcoinNetwork;
   address: string;
+  scriptType: ScriptType;
+  // master fingerprint of master private key (should be same for all accounts with same script type)
   mfp: string;
-}
+};
 
 export type BitcoinAccounts = {
   [network in BitcoinNetwork]: {
-    [pubKey: string]: BitcoinAccount;
+    [address: string]: BitcoinAccount;
   };
 };
 
@@ -158,9 +152,7 @@ export const LNHdPath = `m/84'/0'/${LightningAccount}'/0/0`;
 
 export interface PersistedData {
   network?: BitcoinNetwork;
-  origins: ConnectedOrigin;
   accounts: BitcoinAccounts;
-  currentAccount?: BitcoinAccount;
   lightning?: {
     [walletId: string]: {
       credential: string;

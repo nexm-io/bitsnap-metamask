@@ -94,3 +94,14 @@ Serverless
 ## btc_saveLNDataToSnap, btc_getLNDataFromSnap, btc_signLNInvoice
 
 - RPC for lightning network
+
+
+# Ordinals
+
+## Refs
+
+```
+https://testnet.ordinals.com/
+https://docs.ordinals.com/guides/explorer.html
+https://docs.1satordinals.com/libraries
+```

@@ -8,18 +8,16 @@ import {
   signLNInvoice,
 } from "./rpc";
 import { SnapError, RequestErrors } from "./errors";
-import { connect, disconnect, isConnected } from "./rpc/connect";
-import {
-  addAccount,
-  getAccounts,
-  getCurrentAccount,
-  switchAccount,
-} from "./rpc/account";
+import { addAccount, getAccounts } from "./rpc/account";
+import { initEccLib } from "bitcoinjs-lib";
+import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 
 // @ts-ignore
 globalThis.Buffer = require("buffer/").Buffer;
 
 declare let snap: Snap;
+
+initEccLib(ecc);
 
 export type RpcRequest = {
   origin: string;
@@ -41,37 +39,11 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
         request.params.action,
         request.params.network
       );
-    // Connect
-    case "btc_connect":
-      return connect(
-        origin,
-        snap,
-        request.params.address,
-        request.params.network
-      );
-    case "btc_disconnect":
-      return disconnect(
-        origin,
-        snap,
-        request.params.address,
-        request.params.network
-      );
-    case "btc_isConnected":
-      return isConnected(
-        origin,
-        snap,
-        request.params.address,
-        request.params.network
-      );
     // Accounts
     case "btc_getAccounts":
       return getAccounts(snap);
-    case "btc_getCurrentAccount":
-      return getCurrentAccount(snap);
     case "btc_addAccount":
-      return addAccount(snap, request.params.scriptType, request.params.index);
-    case "btc_switchAccount":
-      return switchAccount(snap, request.params.address, request.params.mfp);
+      return addAccount(snap, request.params.scriptType);
     // Lighting Network
     case "btc_saveLNDataToSnap":
       return saveLNDataToSnap(

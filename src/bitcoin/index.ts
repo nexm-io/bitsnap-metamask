@@ -1,10 +1,11 @@
 import secp256k1 from "secp256k1";
 import { BIP32Interface } from "bip32";
 import { HDSigner, Psbt } from "bitcoinjs-lib";
-import { BitcoinNetwork } from "../interface";
+import { BitcoinAccount, BitcoinNetwork } from "../interface";
 import { PsbtValidator } from "../bitcoin/PsbtValidator";
 import { PsbtHelper } from "../bitcoin/PsbtHelper";
 import { getNetwork } from "./getNetwork";
+import { extractAccountPrivateKeyByPath } from "utils/account";
 
 export class AccountSigner implements HDSigner {
   publicKey: Buffer;
@@ -64,9 +65,9 @@ export class BtcTx {
     this.network = network;
   }
 
-  validateTx(accountSigner: AccountSigner) {
+  validateTx() {
     const validator = new PsbtValidator(this.tx, this.network);
-    return validator.validate(accountSigner);
+    return validator.validate();
   }
 
   extractPsbtJson() {
@@ -79,7 +80,7 @@ export class BtcTx {
       to: psbtHelper.toAddresses.join(","),
       value: `${psbtHelper.sendAmount} ${unit}`,
       fee: `${psbtHelper.fee} ${unit}`,
-      network: `${this.network}net`,
+      network: this.network,
     };
 
     if (changeAddress.length > 0) {
@@ -94,9 +95,13 @@ export class BtcTx {
       .join("");
   }
 
-  signTx(accountSigner: AccountSigner) {
+  signTx(signers: AccountSigner[]) {
     try {
-      this.tx.signAllInputs(accountSigner);
+      for (let i = 0; i < this.tx.data.inputs.length; i++) {
+        this.tx.signInput(i, signers[i]);
+      }
+
+      // this.tx.signAllInputs(accountSigner);
       if (this.tx.validateSignaturesOfAllInputs(validator)) {
         this.tx.finalizeAllInputs();
         const txId = this.tx.extractTransaction().getId();
@@ -109,6 +114,7 @@ export class BtcTx {
         throw new Error("Signature verification failed");
       }
     } catch (e) {
+      console.log(e);
       throw new Error("Sign transaction failed");
     }
   }

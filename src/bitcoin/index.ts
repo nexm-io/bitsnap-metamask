@@ -1,59 +1,56 @@
 import secp256k1 from "secp256k1";
 import { BIP32Interface } from "bip32";
-import { HDSigner, Psbt } from "bitcoinjs-lib";
-import { BitcoinAccount, BitcoinNetwork } from "../interface";
+import { Signer, Psbt } from "bitcoinjs-lib";
+import { BitcoinNetwork } from "../interface";
 import { PsbtValidator } from "../bitcoin/PsbtValidator";
 import { PsbtHelper } from "../bitcoin/PsbtHelper";
 import { getNetwork } from "./getNetwork";
-import { extractAccountPrivateKeyByPath } from "utils/account";
+import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 
-export class AccountSigner implements HDSigner {
+export class AccountSigner implements Signer {
   publicKey: Buffer;
   fingerprint: Buffer;
 
   private readonly node: BIP32Interface;
-  constructor(accountNode: BIP32Interface, mfp?: Buffer) {
+  constructor(accountNode: BIP32Interface, publicKey?: Buffer, mfp?: Buffer) {
     this.node = accountNode;
-    this.publicKey = this.node.publicKey;
+    this.publicKey = publicKey || this.node.publicKey;
     this.fingerprint = mfp || this.node.fingerprint;
-  }
-
-  derivePath(path: string): HDSigner {
-    try {
-      let splitPath = path.split("/");
-      if (splitPath[0] == "m") {
-        splitPath = splitPath.slice(1);
-      }
-      if (splitPath.length > 2) {
-        splitPath = splitPath.slice(-2);
-      }
-      const childNode = splitPath.reduce((prevHd, indexStr) => {
-        let index;
-        if (indexStr.slice(-1) === `'`) {
-          index = parseInt(indexStr.slice(0, -1), 10);
-          return prevHd.deriveHardened(index);
-        } else {
-          index = parseInt(indexStr, 10);
-          return prevHd.derive(index);
-        }
-      }, this.node);
-      return new AccountSigner(childNode, this.fingerprint);
-    } catch (e) {
-      throw new Error("invalid path");
-    }
   }
 
   sign(hash: Buffer): Buffer {
     return this.node.sign(hash);
   }
+
+  signSchnorr(hash: Buffer): Buffer {
+    return this.node.signSchnorr(hash);
+  }
 }
 
 const validator = (pubkey: Buffer, msghash: Buffer, signature: Buffer) => {
+  return (
+    secp256k1.ecdsaVerify(
+      new Uint8Array(signature),
+      new Uint8Array(msghash),
+      new Uint8Array(pubkey)
+    ) || ecc.verifySchnorr(msghash, pubkey, signature)
+  );
+};
+
+const ecdsaValidator = (pubkey: Buffer, msghash: Buffer, signature: Buffer) => {
   return secp256k1.ecdsaVerify(
     new Uint8Array(signature),
     new Uint8Array(msghash),
     new Uint8Array(pubkey)
   );
+};
+
+const schnorrValidator = (
+  pubkey: Buffer,
+  msghash: Buffer,
+  signature: Buffer
+) => {
+  return ecc.verifySchnorr(msghash, pubkey, signature);
 };
 
 export class BtcTx {
@@ -98,21 +95,28 @@ export class BtcTx {
   signTx(signers: AccountSigner[]) {
     try {
       for (let i = 0; i < this.tx.data.inputs.length; i++) {
-        this.tx.signInput(i, signers[i]);
+        if (this.tx.data.inputs[i].tapInternalKey) {
+          this.tx.signTaprootInput(i, signers[i]);
+          if (!this.tx.validateSignaturesOfInput(i, schnorrValidator)) {
+            throw new Error("Signature verification failed");
+          }
+        } else {
+          this.tx.signInput(i, signers[i]);
+          if (!this.tx.validateSignaturesOfInput(i, ecdsaValidator)) {
+            throw new Error("Signature verification failed");
+          }
+        }
       }
 
       // this.tx.signAllInputs(accountSigner);
-      if (this.tx.validateSignaturesOfAllInputs(validator)) {
-        this.tx.finalizeAllInputs();
-        const txId = this.tx.extractTransaction().getId();
-        const txHex = this.tx.extractTransaction().toHex();
-        return {
-          txId,
-          txHex,
-        };
-      } else {
-        throw new Error("Signature verification failed");
-      }
+      // if (this.tx.validateSignaturesOfAllInputs(validator)) {
+      this.tx.finalizeAllInputs();
+      const txId = this.tx.extractTransaction().getId();
+      const txHex = this.tx.extractTransaction().toHex();
+      return {
+        txId,
+        txHex,
+      };
     } catch (e) {
       console.log(e);
       throw new Error("Sign transaction failed");

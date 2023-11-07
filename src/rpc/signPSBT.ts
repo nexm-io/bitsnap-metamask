@@ -3,12 +3,12 @@ import { AccountSigner, BtcTx } from "../bitcoin";
 import { getNetwork } from "../bitcoin/getNetwork";
 import { SnapError, RequestErrors } from "../errors";
 import { heading, panel, text, divider } from "@metamask/snaps-ui";
-import {
-  extractAccountPrivateKey,
-  extractAccountPrivateKeyByPath,
-} from "../utils/account";
+import { extractAccountPrivateKeyByPath } from "../utils/account";
 import { getCurrentNetwork } from "./network";
 import { getAccounts } from "./account";
+
+const toXOnly = (pubKey: Buffer) =>
+  pubKey.length === 32 ? pubKey : pubKey.slice(1, 33);
 
 export async function signPsbt(
   origin: string,
@@ -31,7 +31,15 @@ export async function signPsbt(
         getNetwork(snapNetwork),
         signer.derivationPath
       );
-      signers.push(new AccountSigner(accountPrivateKey));
+
+      signers.push(
+        new AccountSigner(
+          accountPrivateKey,
+          signer.derivationPath[1] === "86'"
+            ? toXOnly(accountPrivateKey.publicKey)
+            : undefined
+        )
+      );
     } else {
       throw SnapError.of(RequestErrors.AccountNotExisted);
     }
@@ -56,7 +64,6 @@ export async function signPsbt(
 
   if (result) {
     btcTx.validateTx();
-    console.log(signers.length);
     return btcTx.signTx(signers);
   } else {
     throw SnapError.of(RequestErrors.RejectSign);

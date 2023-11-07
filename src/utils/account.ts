@@ -1,8 +1,8 @@
-import * as bip32 from "bip32";
-import { BIP32Interface } from "bip32";
+import BIP32Factory, { BIP32Interface } from "bip32";
 import { Network, networks } from "bitcoinjs-lib";
 import { ScriptType, Snap } from "../interface";
 import { SLIP10Node, JsonSLIP10Node } from "@metamask/key-tree";
+import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 
 export const pathMap: Record<ScriptType, string[]> = {
   [ScriptType.P2PKH]: ["m", "44'", "0'"],
@@ -36,7 +36,7 @@ export async function extractAccountPrivateKey(
 
   const privateKeyBuffer = Buffer.from(slip10Node.privateKeyBytes);
   const chainCodeBuffer = Buffer.from(slip10Node.chainCodeBytes);
-  const node: BIP32Interface = bip32.fromPrivateKey(
+  const node: BIP32Interface = BIP32Factory(ecc).fromPrivateKey(
     privateKeyBuffer,
     chainCodeBuffer,
     network
@@ -76,7 +76,7 @@ export async function extractAccountPrivateKeyByPath(
 
   const privateKeyBuffer = Buffer.from(slip10Node.privateKeyBytes);
   const chainCodeBuffer = Buffer.from(slip10Node.chainCodeBytes);
-  const node: BIP32Interface = bip32.fromPrivateKey(
+  const node: BIP32Interface = BIP32Factory(ecc).fromPrivateKey(
     privateKeyBuffer,
     chainCodeBuffer,
     network

@@ -57,6 +57,18 @@ Serverless
     - BTC_NATIVE_SEGWIT (BTC_TESTNET_NATIVE_SEGWIT)         <=> P2WPKH - BIP84
 - UTXO:
     - Unspent Transaction Outputs
+- 2 ways spending a P2TR output
+    - Key Path Spending:
+        - P2TR funds are locked to a single public key similarly to pay-to-public-key (P2PK) outputs
+        - Empty input script and a Schnorr signature of the corresponding private key
+        - Used in single-sig
+    - Script Path Spending:
+        - Leaf need to be proven (Inner key + Merkle Path to that Leaf + script encoded in Leaf) = ControlBlock
+- Key Tweaking
+    - BIP-341 + BIP-86 = https://github.com/bitcoin/bips/blob/master/bip-0086.mediawiki
+    - Public Key:
+        - Internal Key = Derived Key (X only)
+        - Output Key (Tweaked) = Internal Key + int(HashTapTweak(bytes(internal_key)))G
 
 ## btc_getAllXpubs
 
@@ -104,4 +116,5 @@ Serverless
 https://testnet.ordinals.com/
 https://docs.ordinals.com/guides/explorer.html
 https://docs.1satordinals.com/libraries
+https://medium.com/@BR_Robin/basic-taproot-wallet-with-script-path-spend-c41f3f648a5a
 ```

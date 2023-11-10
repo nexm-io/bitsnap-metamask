@@ -6,6 +6,7 @@ import { heading, panel, text, divider } from "@metamask/snaps-ui";
 import { extractAccountPrivateKeyByPath } from "../utils/account";
 import { getCurrentNetwork } from "./network";
 import { getAccounts } from "./account";
+import { Signer, crypto } from "bitcoinjs-lib";
 
 const toXOnly = (pubKey: Buffer) =>
   pubKey.length === 32 ? pubKey : pubKey.slice(1, 33);
@@ -13,16 +14,17 @@ const toXOnly = (pubKey: Buffer) =>
 export async function signPsbt(
   origin: string,
   snap: Snap,
-  psbt: string
+  psbt: string,
+  signerAddresses?: string
 ): Promise<{ txId: string; txHex: string }> {
   const snapNetwork = await getCurrentNetwork(snap);
 
   const btcTx = new BtcTx(psbt, snapNetwork);
   const txDetails = btcTx.extractPsbtJson();
-  const senders = txDetails.from.split(",");
+  const senders = (signerAddresses ?? txDetails.from).split(",");
 
   const accounts = await getAccounts(snap);
-  const signers: AccountSigner[] = [];
+  const signers: Signer[] = [];
   for (const sender of senders) {
     const signer = accounts.find((account) => account.address === sender);
     if (signer) {
@@ -32,14 +34,14 @@ export async function signPsbt(
         signer.derivationPath
       );
 
-      signers.push(
-        new AccountSigner(
-          accountPrivateKey,
-          signer.derivationPath[1] === "86'"
-            ? toXOnly(accountPrivateKey.publicKey)
-            : undefined
-        )
-      );
+      if (signer.derivationPath[1] === "86'") {
+        const tweakedChildNode = accountPrivateKey.tweak(
+          crypto.taggedHash("TapTweak", toXOnly(accountPrivateKey.publicKey))
+        );
+        signers.push(tweakedChildNode);
+      } else {
+        signers.push(new AccountSigner(accountPrivateKey));
+      }
     } else {
       throw SnapError.of(RequestErrors.AccountNotExisted);
     }

@@ -1,35 +1,42 @@
-import * as bip32 from 'bip32';
-import {BIP32Interface} from 'bip32';
-import {BitcoinNetwork, SLIP10Node, Snap} from '../interface';
-import {getNetwork} from '../bitcoin/getNetwork';
-import {parseLightningPath} from '../bitcoin/cryptoPath';
-import { trimHexPrefix } from '../utils/hexHelper';
+import BIP32Factory from "bip32";
+import { BIP32Interface } from "bip32";
+import { BitcoinNetwork, SLIP10Node, Snap } from "../interface";
+import { getNetwork } from "../bitcoin/getNetwork";
+import { parseLightningPath } from "../bitcoin/cryptoPath";
+import { trimHexPrefix } from "../utils/hexHelper";
+import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 
-const CRYPTO_CURVE = 'secp256k1';
+const CRYPTO_CURVE = "secp256k1";
 
 export const getHDNode = async (snap: Snap, hdPath: string) => {
-  const {purpose, coinType, account, change, index} =
+  const { purpose, coinType, account, change, index } =
     parseLightningPath(hdPath);
   const network =
-    coinType.value === '0'
+    coinType.value === "0"
       ? getNetwork(BitcoinNetwork.Main)
       : getNetwork(BitcoinNetwork.Test);
-  const path = ['m', purpose.value, coinType.value];
+  const path = ["m", purpose.value, coinType.value];
 
   const slip10Node = (await snap.request({
-    method: 'snap_getBip32Entropy',
+    method: "snap_getBip32Entropy",
     params: {
       path: path,
       curve: CRYPTO_CURVE,
     },
   })) as SLIP10Node;
 
-  const privateKeyBuffer = Buffer.from(trimHexPrefix(slip10Node.privateKey), 'hex');
-  const chainCodeBuffer = Buffer.from(trimHexPrefix(slip10Node.chainCode), 'hex');
-  const node: BIP32Interface = bip32.fromPrivateKey(
+  const privateKeyBuffer = Buffer.from(
+    trimHexPrefix(slip10Node.privateKey),
+    "hex"
+  );
+  const chainCodeBuffer = Buffer.from(
+    trimHexPrefix(slip10Node.chainCode),
+    "hex"
+  );
+  const node: BIP32Interface = BIP32Factory(ecc).fromPrivateKey(
     privateKeyBuffer,
     chainCodeBuffer,
-    network,
+    network
   );
   //@ts-ignore
   // ignore checking since no function to set depth for node

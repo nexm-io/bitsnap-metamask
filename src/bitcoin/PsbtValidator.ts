@@ -1,5 +1,4 @@
 import { Psbt } from "bitcoinjs-lib";
-import { AccountSigner } from "./index";
 import { BitcoinNetwork } from "../interface";
 import { PsbtHelper } from "../bitcoin/PsbtHelper";
 import { fromHdPathToObj } from "./cryptoPath";

@@ -6,15 +6,16 @@ import { PsbtValidator } from "../bitcoin/PsbtValidator";
 import { PsbtHelper } from "../bitcoin/PsbtHelper";
 import { getNetwork } from "./getNetwork";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
+import { isTaprootInput } from "bitcoinjs-lib/src/psbt/bip371";
 
 export class AccountSigner implements Signer {
   publicKey: Buffer;
   fingerprint: Buffer;
 
   private readonly node: BIP32Interface;
-  constructor(accountNode: BIP32Interface, publicKey?: Buffer, mfp?: Buffer) {
+  constructor(accountNode: BIP32Interface, mfp?: Buffer) {
     this.node = accountNode;
-    this.publicKey = publicKey || this.node.publicKey;
+    this.publicKey = this.node.publicKey;
     this.fingerprint = mfp || this.node.fingerprint;
   }
 
@@ -26,16 +27,6 @@ export class AccountSigner implements Signer {
     return this.node.signSchnorr(hash);
   }
 }
-
-const validator = (pubkey: Buffer, msghash: Buffer, signature: Buffer) => {
-  return (
-    secp256k1.ecdsaVerify(
-      new Uint8Array(signature),
-      new Uint8Array(msghash),
-      new Uint8Array(pubkey)
-    ) || ecc.verifySchnorr(msghash, pubkey, signature)
-  );
-};
 
 const ecdsaValidator = (pubkey: Buffer, msghash: Buffer, signature: Buffer) => {
   return secp256k1.ecdsaVerify(
@@ -92,24 +83,22 @@ export class BtcTx {
       .join("");
   }
 
-  signTx(signers: AccountSigner[]) {
+  signTx(signers: Signer[]) {
     try {
       for (let i = 0; i < this.tx.data.inputs.length; i++) {
-        if (this.tx.data.inputs[i].tapInternalKey) {
-          this.tx.signTaprootInput(i, signers[i]);
+        this.tx.signInput(i, signers[i]);
+        // Validate signature
+        if (isTaprootInput(this.tx.data.inputs[i])) {
           if (!this.tx.validateSignaturesOfInput(i, schnorrValidator)) {
             throw new Error("Signature verification failed");
           }
         } else {
-          this.tx.signInput(i, signers[i]);
           if (!this.tx.validateSignaturesOfInput(i, ecdsaValidator)) {
             throw new Error("Signature verification failed");
           }
         }
       }
 
-      // this.tx.signAllInputs(accountSigner);
-      // if (this.tx.validateSignaturesOfAllInputs(validator)) {
       this.tx.finalizeAllInputs();
       const txId = this.tx.extractTransaction().getId();
       const txHex = this.tx.extractTransaction().toHex();

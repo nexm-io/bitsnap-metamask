@@ -80,7 +80,7 @@ export const deriveAddress = (
       // Since internalKey is an xOnly pubkey, we drop the DER header byte
       const xOnlyPubkey = toXOnly(publicKey);
       address = payments.p2tr({
-        pubkey: xOnlyPubkey,
+        internalPubkey: xOnlyPubkey,
         network: network,
       }).address;
       break;

@@ -29,8 +29,8 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
 
   switch (request.method) {
     case "btc_signPsbt":
-      const psbt = request.params.psbt;
-      return signPsbt(origin, snap, psbt);
+      const { psbt, signerAddresses } = request.params;
+      return signPsbt(origin, snap, psbt, signerAddresses);
     // Network
     case "btc_network":
       return manageNetwork(

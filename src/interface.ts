@@ -2,6 +2,7 @@ export interface SignPsbt {
   method: "btc_signPsbt";
   params: {
     psbt: string;
+    signerAddresses?: string;
   };
 }
 

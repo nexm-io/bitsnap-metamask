@@ -15,27 +15,19 @@ export class PsbtValidator {
   private readonly snapNetwork: BitcoinNetwork;
   private psbtHelper: PsbtHelper;
   private error: SnapError | null = null;
+  private signerAddresses: string[];
 
-  constructor(psbt: Psbt, network: BitcoinNetwork) {
+  constructor(psbt: Psbt, network: BitcoinNetwork, signerAddresses: string[]) {
     this.tx = psbt;
     this.snapNetwork = network;
-    this.psbtHelper = new PsbtHelper(this.tx, network);
+    this.signerAddresses = signerAddresses;
+    this.psbtHelper = new PsbtHelper(this.tx, signerAddresses);
   }
 
   get coinType() {
     return this.snapNetwork === BitcoinNetwork.Main
       ? BITCOIN_MAINNET_COIN_TYPE
       : BITCOIN_TESTNET_COIN_TYPE;
-  }
-
-  allInputsHaveRawTxHex() {
-    const result = this.tx.data.inputs.every(
-      (input, index) => !!input.nonWitnessUtxo
-    );
-    if (!result) {
-      this.error = SnapError.of(PsbtValidateErrors.InputsDataInsufficient);
-    }
-    return result;
   }
 
   everyOutputMatchesNetwork() {
@@ -88,10 +80,14 @@ export class PsbtValidator {
     return result;
   }
 
+  inputAndSignerMatchSize() {
+    return this.signerAddresses.length === this.tx.txInputs.length;
+  }
+
   validate() {
     this.error = null;
 
-    this.allInputsHaveRawTxHex() &&
+    this.inputAndSignerMatchSize() &&
       this.everyOutputMatchesNetwork() &&
       this.feeUnderThreshold() &&
       this.witnessUtxoValueMatchesNoneWitnessOnes();

@@ -15,18 +15,19 @@ export async function signPsbt(
   origin: string,
   snap: Snap,
   psbt: string,
-  signerAddresses?: string
+  signerAddresses: string[]
 ): Promise<{ txId: string; txHex: string }> {
   const snapNetwork = await getCurrentNetwork(snap);
 
-  const btcTx = new BtcTx(psbt, snapNetwork);
+  const btcTx = new BtcTx(psbt, snapNetwork, signerAddresses);
   const txDetails = btcTx.extractPsbtJson();
-  const senders = (signerAddresses ?? txDetails.from).split(",");
 
   const accounts = await getAccounts(snap);
   const signers: Signer[] = [];
-  for (const sender of senders) {
-    const signer = accounts.find((account) => account.address === sender);
+  for (const signerAddress of signerAddresses) {
+    const signer = accounts.find(
+      (account) => account.address === signerAddress
+    );
     if (signer) {
       const accountPrivateKey = await extractAccountPrivateKeyByPath(
         snap,

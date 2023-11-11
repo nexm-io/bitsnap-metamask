@@ -47,25 +47,35 @@ const schnorrValidator = (
 export class BtcTx {
   private tx: Psbt;
   private network: BitcoinNetwork;
+  private signerAddresses: string[];
 
-  constructor(base64Psbt: string, network: BitcoinNetwork) {
+  constructor(
+    base64Psbt: string,
+    network: BitcoinNetwork,
+    signerAddresses: string[]
+  ) {
     this.tx = Psbt.fromBase64(base64Psbt, { network: getNetwork(network) });
     this.network = network;
+    this.signerAddresses = signerAddresses;
   }
 
   validateTx() {
-    const validator = new PsbtValidator(this.tx, this.network);
+    const validator = new PsbtValidator(
+      this.tx,
+      this.network,
+      this.signerAddresses
+    );
     return validator.validate();
   }
 
   extractPsbtJson() {
-    const psbtHelper = new PsbtHelper(this.tx, this.network);
+    const psbtHelper = new PsbtHelper(this.tx, this.signerAddresses);
     const changeAddress = psbtHelper.changeAddresses;
     const unit = this.network === BitcoinNetwork.Main ? "sats" : "tsats";
 
     const transaction = {
-      from: psbtHelper.fromAddresses.join(","),
-      to: psbtHelper.toAddresses.join(","),
+      from: "\t" + psbtHelper.fromAddresses.join("\n\t"),
+      to: "\t" + psbtHelper.toAddresses.join("\n\t"),
       value: `${psbtHelper.sendAmount} ${unit}`,
       fee: `${psbtHelper.fee} ${unit}`,
       network: this.network,
@@ -75,12 +85,6 @@ export class BtcTx {
       return { ...transaction, changeAddress: changeAddress.join(",") };
     }
     return transaction;
-  }
-
-  extractPsbtJsonString() {
-    return Object.entries(this.extractPsbtJson())
-      .map(([key, value]) => `${key}: ${value}\n`)
-      .join("");
   }
 
   signTx(signers: Signer[]) {

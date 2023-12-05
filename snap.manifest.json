@@ -1,10 +1,10 @@
 {
   "version": "0.1.0",
-  "description": "Nexm: Metamask snap to manage your Bitcoin",
-  "proposedName": "Nexm",
+  "description": "Bitsnap: Metamask snap to manage your Bitcoin",
+  "proposedName": "Bitsnap",
   "repository": {
     "type": "git",
-    "url": "https://github.com/snapdao/btcsnap"
+    "url": "https://github.com/nexm-io/bitsnap"
   },
   "source": {
     "shasum": "HRw7ekuU3i0BvjIopi1L0bUKQOaRr0SAz57WiKiAu3k=",

@@ -1,14 +1,14 @@
 # bitsnap [![0.0.1](https://badge.fury.io/js/bitsnap.png)](https://badge.fury.io/js/bitsnap)
 
-![./images/icon.png](./images/icon.png)
+![./images/icon.svg](./images/icon.svg)
 
-`bitsnap` allow users to directly manage Bitcoin within the MetaMask interface, without having to wrap tokens.
+`bitsnap` allows users to manage Bitcoin directly within the MetaMask interface without having to wrap tokens.
 `bitsnap` is currently live on [Metamask](https://metamask.io/).
 
 ##
 
 ### MetaMask Snaps Introduction
-Snaps is a system that allows developers to safely build and expand the capabilities of MetaMask. It is a program that is run in an isolated environment with a limited set of capabilities, that can customize and modify MetaMask's wallet experience for end users. For example, a snap can add new APIs to MetaMask thus adding support for different blockchains or modify existing functionalities using internal APIs.
+Snap is a system that allows developers to build and expand the capabilities of MetaMask safely. It is a program run in an isolated environment with limited capabilities that can customize and modify MetaMask's wallet experience for end users. For example, a snap can add new APIs to MetaMask, thus adding support for different blockchains or change existing functionalities using internal APIs.
 
 Additional information can be found [here](https://docs.metamask.io/guide/snaps.html).
 

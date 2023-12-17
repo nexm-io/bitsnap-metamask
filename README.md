@@ -1,6 +1,6 @@
 # bitsnap [![0.0.1](https://badge.fury.io/js/bitsnap.png)](https://badge.fury.io/js/bitsnap)
 
-![./images/home.png](./images/home.png)
+![./images/icon.png](./images/icon.png)
 
 `bitsnap` allow users to directly manage Bitcoin within the MetaMask interface, without having to wrap tokens.
 `bitsnap` is currently live on [Metamask](https://metamask.io/).

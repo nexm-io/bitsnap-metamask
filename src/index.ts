@@ -60,14 +60,17 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
         request.params.credential,
         request.params.password
       );
+
     case "btc_getLNDataFromSnap":
       return getLNDataFromSnap(origin, snap, {
         key: request.params.key,
         ...(request.params.walletId && { walletId: request.params.walletId }),
         ...(request.params.type && { type: request.params.type }),
       });
+
     case "btc_signLNInvoice":
       return signLNInvoice(origin, snap, request.params.invoice);
+
     default:
       throw SnapError.of(RequestErrors.MethodNotSupport);
   }

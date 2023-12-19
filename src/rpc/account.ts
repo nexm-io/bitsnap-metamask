@@ -119,7 +119,7 @@ export async function addAccounts(
 
   const keys = Object.keys(ScriptType);
   keys.forEach(async (key, index) => {
-    const scriptType = key as ScriptType;
+    const scriptType: ScriptType = ScriptType[key as keyof typeof ScriptType];
 
     const {
       node: accountNode,
@@ -136,7 +136,6 @@ export async function addAccounts(
       mfp: mfp,
       scriptType,
     };
-
     arrAccounts.push(newAccount);
   })
 

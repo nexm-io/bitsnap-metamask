@@ -8,7 +8,7 @@ import {
   signLNInvoice,
 } from "./rpc";
 import { SnapError, RequestErrors } from "./errors";
-import { addAccount, getAccounts } from "./rpc/account";
+import { addAccount, addAccounts, getAccounts } from "./rpc/account";
 import { initEccLib } from "bitcoinjs-lib";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 
@@ -31,6 +31,7 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
     case "btc_signPsbt":
       const { psbt, signerAddresses } = request.params;
       return signPsbt(origin, snap, psbt, signerAddresses);
+
     // Network
     case "btc_network":
       return manageNetwork(
@@ -39,11 +40,17 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
         request.params.action,
         request.params.network
       );
+
     // Accounts
     case "btc_getAccounts":
       return getAccounts(snap);
+
     case "btc_addAccount":
       return addAccount(snap, request.params.scriptType);
+
+    case "btc_addAccounts":
+      return addAccounts(snap);
+
     // Lighting Network
     case "btc_saveLNDataToSnap":
       return saveLNDataToSnap(
@@ -53,14 +60,17 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
         request.params.credential,
         request.params.password
       );
+
     case "btc_getLNDataFromSnap":
       return getLNDataFromSnap(origin, snap, {
         key: request.params.key,
         ...(request.params.walletId && { walletId: request.params.walletId }),
         ...(request.params.type && { type: request.params.type }),
       });
+
     case "btc_signLNInvoice":
       return signLNInvoice(origin, snap, request.params.invoice);
+
     default:
       throw SnapError.of(RequestErrors.MethodNotSupport);
   }

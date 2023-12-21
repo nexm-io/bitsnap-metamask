@@ -103,3 +103,64 @@ export async function addAccount(
   }
   return newAccount;
 }
+
+export async function addAccounts(
+  snap: Snap
+): Promise<BitcoinAccount[]> {
+
+  const accounts = await getPersistedData<BitcoinAccounts>(
+    snap,
+    "accounts",
+    DEFAULT_BITCOIN_ACCOUNTS
+  );
+  const snapNetwork: BitcoinNetwork = await getCurrentNetwork(snap);
+  const network = getNetwork(snapNetwork);
+  var arrAccounts: Array<BitcoinAccount> = [];
+
+  const keys = Object.keys(ScriptType);
+  keys.forEach(async (key, index) => {
+    const scriptType: ScriptType = ScriptType[key as keyof typeof ScriptType];
+
+    const {
+      node: accountNode,
+      mfp,
+      path,
+    } = await extractAccountPrivateKey(snap, network, scriptType, index);
+    const account = accountNode.neutered();
+    const address = deriveAddress(account.publicKey, scriptType, network);
+
+    const newAccount = {
+      derivationPath: path,
+      pubKey: account.publicKey.toString("hex"),
+      address,
+      mfp: mfp,
+      scriptType,
+    };
+    arrAccounts.push(newAccount);
+  })
+
+  const result = await snap.request({
+    method: "snap_dialog",
+    params: {
+      type: "confirmation",
+      content: panel([
+        heading("Add new accounts"),
+        text(
+          `Do you want to add 4 types of account to metamask?`
+        ),
+      ]),
+    },
+  });
+
+
+  if (result) {
+    arrAccounts.forEach(async function (acc, index) {
+      accounts[snapNetwork][acc.address] = acc;
+      await updatePersistedData(snap, "accounts", accounts);
+    })
+
+  }
+
+  return arrAccounts;
+
+}

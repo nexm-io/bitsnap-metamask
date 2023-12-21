@@ -53,6 +53,10 @@ export interface AddAccount {
   };
 }
 
+export interface AddAccounts {
+  method: "btc_addAccounts";
+}
+
 export interface SwitchAccount {
   method: "btc_switchAccount";
   params: {
@@ -95,6 +99,7 @@ export type MetamaskBTCRpcRequest =
   | GetAccounts
   | GetCurrentAccount
   | AddAccount
+  | AddAccounts
   | SwitchAccount
   | SignPsbt
   | ManageNetwork

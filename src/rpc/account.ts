@@ -118,14 +118,18 @@ export async function addAccounts(
   var arrAccounts: Array<BitcoinAccount> = [];
 
   const keys = Object.keys(ScriptType);
-  keys.forEach(async (key, index) => {
+  const newIndex = Object.values(accounts[snapNetwork]).filter(
+    (account) => account.scriptType === ScriptType.P2TR
+  ).length;
+
+  keys.forEach(async (key, _) => {
     const scriptType: ScriptType = ScriptType[key as keyof typeof ScriptType];
 
     const {
       node: accountNode,
       mfp,
       path,
-    } = await extractAccountPrivateKey(snap, network, scriptType, index);
+    } = await extractAccountPrivateKey(snap, network, scriptType, newIndex);
     const account = accountNode.neutered();
     const address = deriveAddress(account.publicKey, scriptType, network);
 

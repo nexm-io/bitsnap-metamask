@@ -82,5 +82,6 @@ export async function addAccount(snap: Snap): Promise<SnapAccount | undefined> {
     await updatePersistedData(snap, "accounts", accounts);
     return accounts[snapNetwork][newIndex];
   }
+
   return undefined;
 }

@@ -7,10 +7,10 @@ export async function getCurrentNetwork(snap: Snap) {
   const snapNetwork: BitcoinNetwork = await getPersistedData<BitcoinNetwork>(
     snap,
     "network",
-    BitcoinNetwork.Test
+    BitcoinNetwork.Main
   );
   if (!snapNetwork) {
-    await updatePersistedData(snap, "network", BitcoinNetwork.Test);
+    await updatePersistedData(snap, "network", BitcoinNetwork.Main);
   }
   return snapNetwork;
 }
@@ -32,7 +32,7 @@ export async function manageNetwork(
           content: panel([
             heading("Switch your network"),
             text(
-              `Do you want to allow ${origin} to switch Bitcoin network to ${target}?`
+              `Do you want to allow ${origin} to switch network to ${target}?`
             ),
           ]),
         },

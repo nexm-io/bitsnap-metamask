@@ -1,8 +1,15 @@
 import BIP32Factory, { BIP32Interface } from "bip32";
-import { Network, networks } from "bitcoinjs-lib";
-import { ScriptType, Snap } from "../interface";
+import { Network, networks, crypto } from "bitcoinjs-lib";
+import { BitcoinAccount, ScriptType, Snap } from "../interface";
 import { SLIP10Node, JsonSLIP10Node } from "@metamask/key-tree";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
+import { getNetwork } from "../bitcoin/getNetwork";
+import { AccountSigner } from "../bitcoin";
+import { RequestErrors, SnapError } from "../errors";
+import { getCurrentNetwork } from "../rpc/network";
+
+const toXOnly = (pubKey: Buffer) =>
+  pubKey.length === 32 ? pubKey : pubKey.slice(1, 33);
 
 export const pathMap: Record<ScriptType, string[]> = {
   [ScriptType.P2PKH]: ["m", "44'", "0'"],
@@ -89,4 +96,51 @@ export async function extractAccountPrivateKeyByPath(
   node.__INDEX = slip10Node.index;
 
   return node;
+}
+
+export async function getSigner(
+  snap: Snap,
+  accounts: BitcoinAccount[],
+  signerAddress: string
+) {
+  const snapNetwork = await getCurrentNetwork(snap);
+  const signer = accounts.find((account) => account.address === signerAddress);
+  if (signer) {
+    const accountPrivateKey = await extractAccountPrivateKeyByPath(
+      snap,
+      getNetwork(snapNetwork),
+      signer.derivationPath
+    );
+
+    if (signer.derivationPath[1] === "86'") {
+      const tweakedChildNode = accountPrivateKey.tweak(
+        crypto.taggedHash("TapTweak", toXOnly(accountPrivateKey.publicKey))
+      );
+      return tweakedChildNode;
+    } else {
+      return new AccountSigner(accountPrivateKey);
+    }
+  } else {
+    throw SnapError.of(RequestErrors.AccountNotExisted);
+  }
+}
+
+export async function getPrivateKey(
+  snap: Snap,
+  accounts: BitcoinAccount[],
+  signerAddress: string
+) {
+  const snapNetwork = await getCurrentNetwork(snap);
+  const signer = accounts.find((account) => account.address === signerAddress);
+  if (signer) {
+    const accountPrivateKey = await extractAccountPrivateKeyByPath(
+      snap,
+      getNetwork(snapNetwork),
+      signer.derivationPath
+    );
+
+    return accountPrivateKey.privateKey;
+  } else {
+    throw SnapError.of(RequestErrors.AccountNotExisted);
+  }
 }

@@ -53,10 +53,6 @@ export interface AddAccount {
   };
 }
 
-export interface AddAccounts {
-  method: "btc_addAccounts";
-}
-
 export interface SwitchAccount {
   method: "btc_switchAccount";
   params: {
@@ -76,19 +72,11 @@ export interface SaveLNDataToSnap {
   };
 }
 
-export interface GetLNDataFromSnap {
-  method: "btc_getLNDataFromSnap";
-  params: {
-    key: KeyOptions;
-    walletId?: string;
-    type?: "get" | "refresh";
-  };
-}
-
 export interface SignLNInvoice {
   method: "btc_signLNInvoice";
   params: {
     invoice: string;
+    signerAddress: string;
   };
 }
 
@@ -99,12 +87,10 @@ export type MetamaskBTCRpcRequest =
   | GetAccounts
   | GetCurrentAccount
   | AddAccount
-  | AddAccounts
   | SwitchAccount
   | SignPsbt
   | ManageNetwork
   | SaveLNDataToSnap
-  | GetLNDataFromSnap
   | SignLNInvoice;
 
 export type BTCMethodCallback = (
@@ -141,20 +127,13 @@ export type BitcoinAccount = {
   mfp: string;
 };
 
-export type BitcoinAccounts = {
-  [network in BitcoinNetwork]: {
-    [address: string]: BitcoinAccount;
-  };
+export type SnapAccount = {
+  [scriptType: string]: BitcoinAccount;
 };
 
-export enum KeyOptions {
-  Password = "password",
-  Credential = "credential",
-  PubKey = "pubkey",
-}
-
-const LightningAccount = Buffer.from("Lightning").readInt32BE();
-export const LNHdPath = `m/84'/0'/${LightningAccount}'/0/0`;
+export type BitcoinAccounts = {
+  [network in BitcoinNetwork]: SnapAccount[];
+};
 
 export interface PersistedData {
   network?: BitcoinNetwork;

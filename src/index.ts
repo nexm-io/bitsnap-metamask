@@ -19,6 +19,7 @@ export type RpcRequest = {
 
 export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
   switch (request.method) {
+    // Transaction
     case "btc_signPsbt":
       const { psbt, signerAddresses } = request.params;
       return signPsbt(origin, snap, psbt, signerAddresses);

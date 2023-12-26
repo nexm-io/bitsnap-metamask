@@ -30,6 +30,11 @@ export async function getAccounts(
     DEFAULT_BITCOIN_ACCOUNTS
   );
 
+  // create a snap account if there is nothing inside the persist storage
+  if (accounts[snapNetwork].length == 0) {
+    await createNewSnapAccount(snap, accounts, snapNetwork);
+  }
+
   return Object.values(accounts[snapNetwork]);
 }
 
@@ -40,8 +45,6 @@ export async function addAccount(snap: Snap): Promise<SnapAccount | undefined> {
     DEFAULT_BITCOIN_ACCOUNTS
   );
   const snapNetwork: BitcoinNetwork = await getCurrentNetwork(snap);
-
-  const network = getNetwork(snapNetwork);
   const newIndex = Object.keys(accounts[snapNetwork]).length + 1;
 
   const result = await snap.request({
@@ -56,32 +59,39 @@ export async function addAccount(snap: Snap): Promise<SnapAccount | undefined> {
   });
 
   if (result) {
-    const newSnapAccount: SnapAccount = {};
-    for (const scriptType of Object.values(ScriptType)) {
-      const {
-        node: accountNode,
-        mfp,
-        path,
-      } = await extractAccountPrivateKey(snap, network, scriptType, newIndex);
-      const account = accountNode.neutered();
-      const address = deriveAddress(account.publicKey, scriptType, network);
-
-      const newAccount: BitcoinAccount = {
-        derivationPath: path,
-        pubKey: account.publicKey.toString("hex"),
-        address,
-        mfp: mfp,
-        scriptType,
-      };
-
-      newSnapAccount[scriptType] = newAccount;
-    }
-
-    accounts[snapNetwork].push(newSnapAccount);
-
-    await updatePersistedData(snap, "accounts", accounts);
-    return accounts[snapNetwork][newIndex];
+    return await createNewSnapAccount(snap, accounts, snapNetwork);
   }
 
   return undefined;
 }
+
+const createNewSnapAccount = async (snap: Snap, accounts: BitcoinAccounts, snapNetwork: BitcoinNetwork) => {
+  const newIndex = Object.keys(accounts[snapNetwork]).length;
+  const network = getNetwork(snapNetwork);
+
+  const newSnapAccount: SnapAccount = {};
+  for (const scriptType of Object.values(ScriptType)) {
+    const {
+      node: accountNode,
+      mfp,
+      path,
+    } = await extractAccountPrivateKey(snap, network, scriptType, newIndex);
+    const account = accountNode.neutered();
+    const address = deriveAddress(account.publicKey, scriptType, network);
+
+    const newAccount: BitcoinAccount = {
+      derivationPath: path,
+      pubKey: account.publicKey.toString("hex"),
+      address,
+      mfp: mfp,
+      scriptType,
+    };
+
+    newSnapAccount[scriptType] = newAccount;
+  }
+
+  accounts[snapNetwork].push(newSnapAccount);
+
+  await updatePersistedData(snap, "accounts", accounts);
+  return accounts[snapNetwork][newIndex];
+};

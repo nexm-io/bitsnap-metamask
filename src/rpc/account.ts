@@ -59,7 +59,7 @@ export async function addAccount(snap: Snap): Promise<SnapAccount | undefined> {
   });
 
   if (result) {
-    await createNewSnapAccount(snap, accounts, snapNetwork);
+    return await createNewSnapAccount(snap, accounts, snapNetwork);
   }
 
   return undefined;

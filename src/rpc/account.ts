@@ -24,7 +24,7 @@ export async function getAccounts(
 ): Promise<SnapAccount[]> {
   const snapNetwork: BitcoinNetwork =
     _network ?? (await getCurrentNetwork(snap));
-  let accounts = await getPersistedData<BitcoinAccounts>(
+  const accounts = await getPersistedData<BitcoinAccounts>(
     snap,
     "accounts",
     DEFAULT_BITCOIN_ACCOUNTS

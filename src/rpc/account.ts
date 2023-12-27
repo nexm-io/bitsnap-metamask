@@ -45,7 +45,7 @@ export async function addAccount(snap: Snap): Promise<SnapAccount | undefined> {
     DEFAULT_BITCOIN_ACCOUNTS
   );
   const snapNetwork: BitcoinNetwork = await getCurrentNetwork(snap);
-  const newIndex = Object.keys(accounts[snapNetwork]).length + 1;
+  const newIndex = Object.keys(accounts[snapNetwork]).length;
 
   const result = await snap.request({
     method: "snap_dialog",

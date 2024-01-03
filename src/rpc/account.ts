@@ -32,9 +32,11 @@ export async function getAccounts(
 
   // create a snap account if there is nothing inside the persist storage
   if (accounts[snapNetwork].length == 0) {
+    console.log("[DEBUG] accounts[snapNetwork].length");
     await createNewSnapAccount(snap, accounts, snapNetwork);
   }
 
+  console.log("[DEBUG] getAccounts => ", Object.values(accounts[snapNetwork]));
   return Object.values(accounts[snapNetwork]);
 }
 

@@ -1,5 +1,5 @@
 {
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Bitsnap: Metamask snap to manage your Bitcoin",
   "proposedName": "Bitsnap",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/nexm-io/bitsnap"
   },
   "source": {
-    "shasum": "gquVd6ds1oRA3AMvg6gj/oLPlBRXqg5i5aL+0A03F0A=",
+    "shasum": "tvrWDZUwGWpWp/9M6J3CXV2w19Hf00YvGOVDk0IbBNA=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

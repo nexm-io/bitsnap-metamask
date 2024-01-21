@@ -4,6 +4,7 @@ import { SnapError, RequestErrors } from "./errors";
 import { addAccount, getAccounts } from "./rpc/account";
 import { initEccLib } from "bitcoinjs-lib";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
+import { signMessage } from "./rpc/signMessage";
 
 // @ts-ignore
 globalThis.Buffer = require("buffer/").Buffer;
@@ -35,6 +36,11 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
 
     case "btc_addAccount":
       return addAccount(snap);
+
+    // Message
+    case "btc_signMessage":
+      const { message, signerAddress: address } = request.params;
+      return signMessage(origin, snap, message, address);
 
     // Lighting Network
     case "btc_signLNInvoice":

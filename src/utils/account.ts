@@ -144,3 +144,23 @@ export async function getPrivateKey(
     throw SnapError.of(RequestErrors.AccountNotExisted);
   }
 }
+
+export async function getPrivateKeyAsWIF(
+  snap: Snap,
+  accounts: BitcoinAccount[],
+  signerAddress: string
+) {
+  const snapNetwork = await getCurrentNetwork(snap);
+  const signer = accounts.find((account) => account.address === signerAddress);
+  if (signer) {
+    const accountPrivateKey = await extractAccountPrivateKeyByPath(
+      snap,
+      getNetwork(snapNetwork),
+      signer.derivationPath
+    );
+
+    return accountPrivateKey.toWIF();
+  } else {
+    throw SnapError.of(RequestErrors.AccountNotExisted);
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "@nexm-io/bitsnap",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Metamask snap to manage your bitcoin",
   "repository": {
     "type": "git",

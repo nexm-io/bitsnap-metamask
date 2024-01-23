@@ -6,6 +6,14 @@ export interface SignPsbt {
   };
 }
 
+export interface SignMessage {
+  method: "btc_signMessage";
+  params: {
+    message: string;
+    signerAddress: string;
+  };
+}
+
 export interface ManageNetwork {
   method: "btc_network";
   params: {
@@ -14,61 +22,14 @@ export interface ManageNetwork {
   };
 }
 
-export interface Connect {
-  method: "btc_connect";
-  params: {
-    address: string;
-    network?: BitcoinNetwork;
-  };
-}
-
-export interface Disconnect {
-  method: "btc_disconnect";
-  params: {
-    address: string;
-    network?: BitcoinNetwork;
-  };
-}
-
-export interface IsConnected {
-  method: "btc_isConnected";
-  params: {
-    address: string;
-    network?: BitcoinNetwork;
-  };
-}
-
 export interface GetAccounts {
   method: "btc_getAccounts";
-}
-
-export interface GetCurrentAccount {
-  method: "btc_getCurrentAccount";
 }
 
 export interface AddAccount {
   method: "btc_addAccount";
   params: {
     scriptType: ScriptType;
-  };
-}
-
-export interface SwitchAccount {
-  method: "btc_switchAccount";
-  params: {
-    scriptType: ScriptType;
-    index: number;
-    address: string;
-    mfp: string;
-  };
-}
-
-export interface SaveLNDataToSnap {
-  method: "btc_saveLNDataToSnap";
-  params: {
-    walletId: string;
-    credential: string;
-    password: string;
   };
 }
 
@@ -81,16 +42,11 @@ export interface SignLNInvoice {
 }
 
 export type MetamaskBTCRpcRequest =
-  | Connect
-  | Disconnect
-  | IsConnected
   | GetAccounts
-  | GetCurrentAccount
   | AddAccount
-  | SwitchAccount
   | SignPsbt
+  | SignMessage
   | ManageNetwork
-  | SaveLNDataToSnap
   | SignLNInvoice;
 
 export type BTCMethodCallback = (

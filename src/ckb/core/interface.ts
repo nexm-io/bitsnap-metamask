@@ -14,7 +14,20 @@ export interface ManageNetwork {
   };
 }
 
-export type MetamaskCKBRpcRequest = SignTx | ManageNetwork;
+export interface GetCkbAccounts {
+  method: "ckb_getAccounts";
+}
+
+export interface AddCkbAccount {
+  method: "ckb_addAccount";
+  params: {};
+}
+
+export type MetamaskCKBRpcRequest =
+  | SignTx
+  | ManageNetwork
+  | GetCkbAccounts
+  | AddCkbAccount;
 
 export type CKBMethodCallback = (
   originString: string,

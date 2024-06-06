@@ -10,7 +10,7 @@ import { deriveAddress } from "../core/xpubConverter";
 import { getNetwork } from "../core/getNetwork";
 import { extractAccountPrivateKey } from "../utils/account";
 import { getCurrentNetwork } from "./network";
-import { heading, panel, text } from "@metamask/snaps-ui";
+import { heading, Panel, panel, text } from "@metamask/snaps-ui";
 import { Snap } from "../../interface";
 
 const DEFAULT_BITCOIN_ACCOUNTS = {
@@ -51,10 +51,12 @@ export async function addAccount(snap: Snap): Promise<SnapAccount | undefined> {
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Add new account"),
-        text(`Do you want to add new account #${newIndex}?`),
-      ]),
+      content: panel({
+        children: [
+          heading("Add new account"),
+          text(`Do you want to add new account #${newIndex}?`),
+        ],
+      }),
     },
   });
 

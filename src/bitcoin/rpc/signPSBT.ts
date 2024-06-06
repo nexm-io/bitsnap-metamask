@@ -22,16 +22,18 @@ export async function signPsbt(
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Sign Bitcoin Transaction"),
-        text(`Please verify this ongoing Transaction from ${origin}`),
-        divider(),
-        panel(
-          Object.entries(txDetails).map(([key, value]) =>
-            text(`**${key}**:\n ${value}`)
-          )
-        ),
-      ]),
+      content: panel({
+        children: [
+          heading("Sign Bitcoin Transaction"),
+          text(`Please verify this ongoing Transaction from ${origin}`),
+          divider(),
+          panel({
+            children: Object.entries(txDetails).map(([key, value]) =>
+              text(`**${key}**:\n ${value}`)
+            ),
+          }),
+        ],
+      }),
     },
   });
 

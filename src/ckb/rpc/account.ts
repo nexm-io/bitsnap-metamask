@@ -46,10 +46,12 @@ export async function addAccount(snap: Snap): Promise<CkbAccount | undefined> {
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Add new account"),
-        text(`Do you want to add new account #${newIndex}?`),
-      ]),
+      content: panel({
+        children: [
+          heading("Add new account"),
+          text(`Do you want to add new account #${newIndex}?`),
+        ],
+      }),
     },
   });
 

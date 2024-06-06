@@ -7,7 +7,12 @@ import { initEccLib } from "bitcoinjs-lib";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import { signMessage } from "./bitcoin/rpc/signMessage";
 import { Snap } from "./interface";
-import { ckbManageNetwork, ckbSignTx } from "./ckb/rpc";
+import {
+  addCkbAccount,
+  ckbManageNetwork,
+  ckbSignTx,
+  getCkbAccounts,
+} from "./ckb/rpc";
 
 // @ts-ignore
 globalThis.Buffer = require("buffer/").Buffer;
@@ -61,6 +66,13 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
     case "ckb_network":
       const { action: ckbAction, network: ckbNetwork } = request.params;
       return ckbManageNetwork(origin, snap, ckbAction, ckbNetwork);
+
+    // Accounts
+    case "ckb_getAccounts":
+      return getCkbAccounts(snap);
+
+    case "ckb_addAccount":
+      return addCkbAccount(snap);
 
     default:
       throw SnapError.of(RequestErrors.MethodNotSupport);

@@ -22,16 +22,18 @@ export async function ckbSignTx(
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Sign CKB Transaction"),
-        text(`Please verify this ongoing Transaction from ${origin}`),
-        divider(),
-        panel(
-          Object.entries(_extractedTx).map(([key, value]) =>
-            text(`**${key}**:\n ${value}`)
-          )
-        ),
-      ]),
+      content: panel({
+        children: [
+          heading("Sign CKB Transaction"),
+          text(`Please verify this ongoing Transaction from ${origin}`),
+          divider(),
+          panel({
+            children: Object.entries(_extractedTx).map(([key, value]) =>
+              text(`**${key}**:\n ${value}`)
+            ),
+          }),
+        ],
+      }),
     },
   });
 

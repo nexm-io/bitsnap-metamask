@@ -25,15 +25,19 @@ export async function signMessage(
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Sign Bitcoin Message"),
-        text(`Please verify this ongoing message from ${origin}`),
-        divider(),
-        panel([
-          text(`**Address**:\n ${signerAddress}`),
-          text(`**Message**:\n ${message}`),
-        ]),
-      ]),
+      content: panel({
+        children: [
+          heading({ value: "Sign Bitcoin Message" }),
+          text({ value: `Please verify this ongoing message from ${origin}` }),
+          divider(),
+          panel({
+            children: [
+              text({ value: `**Address**:\n ${signerAddress}` }),
+              text({ value: `**Message**:\n ${message}` }),
+            ],
+          }),
+        ],
+      }),
     },
   });
 

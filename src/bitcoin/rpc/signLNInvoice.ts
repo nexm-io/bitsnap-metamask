@@ -17,16 +17,18 @@ export async function signLNInvoice(
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Sign Lightning Transaction"),
-        text(`Please verify this ongoing transaction from ${domain}`),
-        divider(),
-        panel(
-          Object.entries(invoiceContent).map(([key, value]) =>
-            text(`**${key}**:\n ${value}`)
-          )
-        ),
-      ]),
+      content: panel({
+        children: [
+          heading("Sign Lightning Transaction"),
+          text(`Please verify this ongoing transaction from ${domain}`),
+          divider(),
+          panel({
+            children: Object.entries(invoiceContent).map(([key, value]) =>
+              text(`**${key}**:\n ${value}`)
+            ),
+          }),
+        ],
+      }),
     },
   });
 

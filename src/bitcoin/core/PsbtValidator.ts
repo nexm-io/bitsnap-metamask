@@ -1,6 +1,6 @@
 import { Psbt } from "bitcoinjs-lib";
-import { BitcoinNetwork } from "../interface";
-import { PsbtHelper } from "../bitcoin/PsbtHelper";
+import { BitcoinNetwork } from "./interface";
+import { PsbtHelper } from "./PsbtHelper";
 import { fromHdPathToObj } from "./cryptoPath";
 import { PsbtValidateErrors, SnapError } from "../errors";
 

@@ -1,5 +1,5 @@
-import { Snap } from "../interface";
-import { BtcTx } from "../bitcoin";
+import { Snap } from "../core/interface";
+import { BtcTx } from "../core";
 import { SnapError, RequestErrors } from "../errors";
 import { heading, panel, text, divider } from "@metamask/snaps-ui";
 import { getSigner } from "../utils/account";

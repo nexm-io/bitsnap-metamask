@@ -1,4 +1,4 @@
-import { ScriptType, BitcoinNetwork } from "../interface";
+import { ScriptType, BitcoinNetwork } from "./interface";
 import { Network, networks, payments } from "bitcoinjs-lib";
 import { encode, decode } from "bs58check";
 

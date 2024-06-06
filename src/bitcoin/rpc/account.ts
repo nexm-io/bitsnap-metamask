@@ -5,10 +5,10 @@ import {
   ScriptType,
   Snap,
   SnapAccount,
-} from "../interface";
+} from "../core/interface";
 import { getPersistedData, updatePersistedData } from "../utils/manageState";
-import { deriveAddress } from "../bitcoin/xpubConverter";
-import { getNetwork } from "../bitcoin/getNetwork";
+import { deriveAddress } from "../core/xpubConverter";
+import { getNetwork } from "../core/getNetwork";
 import { extractAccountPrivateKey } from "../utils/account";
 import { getCurrentNetwork } from "./network";
 import { heading, panel, text } from "@metamask/snaps-ui";
@@ -65,7 +65,11 @@ export async function addAccount(snap: Snap): Promise<SnapAccount | undefined> {
   return undefined;
 }
 
-const createNewSnapAccount = async (snap: Snap, accounts: BitcoinAccounts, snapNetwork: BitcoinNetwork) => {
+const createNewSnapAccount = async (
+  snap: Snap,
+  accounts: BitcoinAccounts,
+  snapNetwork: BitcoinNetwork
+) => {
   const newIndex = Object.keys(accounts[snapNetwork]).length;
   const network = getNetwork(snapNetwork);
 

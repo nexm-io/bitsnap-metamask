@@ -1,12 +1,12 @@
 import BIP32Factory, { BIP32Interface } from "bip32";
 import { Network, networks, crypto } from "bitcoinjs-lib";
-import { BitcoinAccount, ScriptType, Snap } from "../interface";
+import { BitcoinAccount, ScriptType, Snap } from "../core/interface";
 import { SLIP10Node, JsonSLIP10Node } from "@metamask/key-tree";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
-import { getNetwork } from "../bitcoin/getNetwork";
-import { AccountSigner } from "../bitcoin";
+import { getNetwork } from "../core/getNetwork";
 import { RequestErrors, SnapError } from "../errors";
 import { getCurrentNetwork } from "../rpc/network";
+import { AccountSigner } from "../core";
 
 const toXOnly = (pubKey: Buffer) =>
   pubKey.length === 32 ? pubKey : pubKey.slice(1, 33);

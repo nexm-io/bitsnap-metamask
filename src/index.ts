@@ -1,10 +1,10 @@
-import { Snap, MetamaskBTCRpcRequest } from "./interface";
-import { signPsbt, manageNetwork, signLNInvoice } from "./rpc";
-import { SnapError, RequestErrors } from "./errors";
-import { addAccount, getAccounts } from "./rpc/account";
+import { Snap, MetamaskBTCRpcRequest } from "./bitcoin/core/interface";
+import { signPsbt, manageNetwork, signLNInvoice } from "./bitcoin/rpc";
+import { SnapError, RequestErrors } from "./bitcoin/errors";
+import { addAccount, getAccounts } from "./bitcoin/rpc/account";
 import { initEccLib } from "bitcoinjs-lib";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
-import { signMessage } from "./rpc/signMessage";
+import { signMessage } from "./bitcoin/rpc/signMessage";
 
 // @ts-ignore
 globalThis.Buffer = require("buffer/").Buffer;
@@ -20,6 +20,7 @@ export type RpcRequest = {
 
 export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
   switch (request.method) {
+    /// Bitcoin
     // Transaction
     case "btc_signPsbt":
       const { psbt, signerAddresses } = request.params;
@@ -47,6 +48,7 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
       const { invoice, signerAddress } = request.params;
       return signLNInvoice(origin, snap, invoice, signerAddress);
 
+    /// CKB
     default:
       throw SnapError.of(RequestErrors.MethodNotSupport);
   }

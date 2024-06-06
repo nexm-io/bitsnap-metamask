@@ -1,4 +1,4 @@
-import { BitcoinNetwork, Snap } from "../interface";
+import { BitcoinNetwork, Snap } from "../core/interface";
 import { getPersistedData, updatePersistedData } from "../utils/manageState";
 import { RequestErrors, SnapError } from "../errors";
 import { heading, panel, text } from "@metamask/snaps-ui";

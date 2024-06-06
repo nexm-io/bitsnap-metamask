@@ -1,4 +1,4 @@
-import { BitcoinNetwork, Snap } from "../interface";
+import { BitcoinNetwork, Snap } from "../core/interface";
 import { SnapError, RequestErrors } from "../errors";
 import { heading, panel, text, divider } from "@metamask/snaps-ui";
 import { getPrivateKeyAsWIF } from "../utils/account";

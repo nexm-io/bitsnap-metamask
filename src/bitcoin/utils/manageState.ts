@@ -1,14 +1,14 @@
-import { PersistedData, Snap } from '../interface';
+import { PersistedData, Snap } from "../core/interface";
 
 export const getPersistedData = async <T>(
   snap: Snap,
   key: keyof PersistedData,
-  defaultValue: T,
+  defaultValue: T
 ): Promise<T> => {
   const persistedData = await snap.request<PersistedData>({
-    method: 'snap_manageState',
+    method: "snap_manageState",
     params: {
-      operation: 'get'
+      operation: "get",
     },
   });
   if (persistedData && persistedData[key]) {
@@ -20,12 +20,12 @@ export const getPersistedData = async <T>(
 export const updatePersistedData = async (
   snap: Snap,
   key: keyof PersistedData,
-  value: any,
+  value: any
 ) => {
   const persistedData = await snap.request<PersistedData>({
-    method: 'snap_manageState',
+    method: "snap_manageState",
     params: {
-      operation: 'get'
+      operation: "get",
     },
   });
   const updatedData = {
@@ -34,10 +34,10 @@ export const updatePersistedData = async (
   };
 
   await snap.request({
-    method: 'snap_manageState',
+    method: "snap_manageState",
     params: {
-      operation: 'update',
-      newState: updatedData
+      operation: "update",
+      newState: updatedData,
     },
   });
 };

@@ -1,4 +1,4 @@
-import { Snap } from "../interface";
+import { Snap } from "../core/interface";
 import { transferInvoiceContent } from "../utils/transferLNData";
 import bitcoinMessage from "bitcoinjs-message";
 import { RequestErrors, SnapError } from "../errors";

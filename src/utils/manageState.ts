@@ -1,4 +1,4 @@
-import { PersistedData, Snap } from "../core/interface";
+import { PersistedData, Snap } from "../interface";
 
 export const getPersistedData = async <T>(
   snap: Snap,

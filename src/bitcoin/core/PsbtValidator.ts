@@ -2,7 +2,7 @@ import { Psbt } from "bitcoinjs-lib";
 import { BitcoinNetwork } from "./interface";
 import { PsbtHelper } from "./PsbtHelper";
 import { fromHdPathToObj } from "./cryptoPath";
-import { PsbtValidateErrors, SnapError } from "../errors";
+import { PsbtValidateErrors, SnapError } from "../../errors";
 
 const BITCOIN_MAINNET_COIN_TYPE = 0;
 const BITCOIN_TESTNET_COIN_TYPE = 1;

@@ -3,15 +3,15 @@ import {
   BitcoinAccounts,
   BitcoinNetwork,
   ScriptType,
+  Snap,
   SnapAccount,
-} from "../core/interface";
-import { getPersistedData, updatePersistedData } from "../../utils/manageState";
-import { deriveAddress } from "../core/xpubConverter";
-import { getNetwork } from "../core/getNetwork";
-import { extractAccountPrivateKey } from "../utils/account";
+} from "../bitcoin/interface";
+import { getPersistedData, updatePersistedData } from "../utils/manageState";
+import { deriveAddress } from "../bitcoin/xpubConverter";
+import { getNetwork } from "../bitcoin/getNetwork";
+import { extractAccountPrivateKey } from "../ckb/utils/account";
 import { getCurrentNetwork } from "./network";
 import { heading, panel, text } from "@metamask/snaps-ui";
-import { Snap } from "../../interface";
 
 const DEFAULT_BITCOIN_ACCOUNTS = {
   [BitcoinNetwork.Main]: [] as SnapAccount[],

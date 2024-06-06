@@ -1,10 +1,13 @@
-import { Snap, MetamaskBTCRpcRequest } from "./bitcoin/core/interface";
+import { MetamaskBTCRpcRequest } from "./bitcoin/core/interface";
+import { MetamaskCKBRpcRequest } from "./ckb/core/interface";
 import { signPsbt, manageNetwork, signLNInvoice } from "./bitcoin/rpc";
-import { SnapError, RequestErrors } from "./bitcoin/errors";
+import { SnapError, RequestErrors } from "./errors";
 import { addAccount, getAccounts } from "./bitcoin/rpc/account";
 import { initEccLib } from "bitcoinjs-lib";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import { signMessage } from "./bitcoin/rpc/signMessage";
+import { Snap } from "./interface";
+import { ckbManageNetwork, ckbSignTx } from "./ckb/rpc";
 
 // @ts-ignore
 globalThis.Buffer = require("buffer/").Buffer;
@@ -15,7 +18,7 @@ initEccLib(ecc);
 
 export type RpcRequest = {
   origin: string;
-  request: MetamaskBTCRpcRequest;
+  request: MetamaskBTCRpcRequest | MetamaskCKBRpcRequest;
 };
 
 export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
@@ -49,6 +52,16 @@ export const onRpcRequest = async ({ origin, request }: RpcRequest) => {
       return signLNInvoice(origin, snap, invoice, signerAddress);
 
     /// CKB
+    // Transaction
+    case "ckb_signTx":
+      const { txMessage, senderAddress } = request.params;
+      return ckbSignTx(origin, snap, txMessage, senderAddress);
+
+    // Network
+    case "ckb_network":
+      const { action: ckbAction, network: ckbNetwork } = request.params;
+      return ckbManageNetwork(origin, snap, ckbAction, ckbNetwork);
+
     default:
       throw SnapError.of(RequestErrors.MethodNotSupport);
   }

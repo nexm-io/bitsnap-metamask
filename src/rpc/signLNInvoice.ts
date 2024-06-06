@@ -1,10 +1,10 @@
+import { Snap } from "../bitcoin/interface";
 import { transferInvoiceContent } from "../utils/transferLNData";
 import bitcoinMessage from "bitcoinjs-message";
-import { RequestErrors, SnapError } from "../../errors";
+import { RequestErrors, SnapError } from "../errors";
 import { divider, heading, panel, text } from "@metamask/snaps-ui";
-import { getPrivateKey } from "../utils/account";
+import { getPrivateKey } from "../ckb/utils/account";
 import { getAccounts } from "../rpc/account";
-import { Snap } from "../../interface";
 
 export async function signLNInvoice(
   domain: string,

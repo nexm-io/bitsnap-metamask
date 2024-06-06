@@ -1,11 +1,11 @@
-import { BtcTx } from "../core";
-import { SnapError, RequestErrors } from "../../errors";
+import { Snap } from "../bitcoin/interface";
+import { BtcTx } from "../bitcoin";
+import { SnapError, RequestErrors } from "../errors";
 import { heading, panel, text, divider } from "@metamask/snaps-ui";
-import { getSigner } from "../utils/account";
+import { getSigner } from "../ckb/utils/account";
 import { getCurrentNetwork } from "./network";
 import { getAccounts } from "./account";
 import { Signer } from "bitcoinjs-lib";
-import { Snap } from "../../interface";
 
 export async function signPsbt(
   origin: string,

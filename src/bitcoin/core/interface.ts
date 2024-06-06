@@ -54,14 +54,6 @@ export type BTCMethodCallback = (
   requestObject: MetamaskBTCRpcRequest
 ) => Promise<unknown>;
 
-export interface Snap {
-  registerRpcMessageHandler: (fn: BTCMethodCallback) => unknown;
-  request<T>(options: {
-    method: string;
-    params?: unknown[] | Record<string, any>;
-  }): Promise<T>;
-}
-
 export enum ScriptType {
   P2PKH = "P2PKH",
   P2SH_P2WPKH = "P2SH-P2WPKH",
@@ -90,17 +82,6 @@ export type SnapAccount = {
 export type BitcoinAccounts = {
   [network in BitcoinNetwork]: SnapAccount[];
 };
-
-export interface PersistedData {
-  network?: BitcoinNetwork;
-  accounts: BitcoinAccounts;
-  lightning?: {
-    [walletId: string]: {
-      credential: string;
-      password: string;
-    };
-  };
-}
 
 export interface SLIP10Node {
   /**

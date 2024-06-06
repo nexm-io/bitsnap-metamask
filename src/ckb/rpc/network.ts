@@ -1,17 +1,17 @@
-import { BitcoinNetwork } from "../core/interface";
+import { CkbNetwork } from "../core/interface";
 import { getPersistedData, updatePersistedData } from "../../utils/manageState";
 import { RequestErrors, SnapError } from "../../errors";
 import { heading, panel, text } from "@metamask/snaps-ui";
 import { Snap } from "../../interface";
 
 export async function getCurrentNetwork(snap: Snap) {
-  const snapNetwork: BitcoinNetwork = await getPersistedData<BitcoinNetwork>(
+  const snapNetwork: CkbNetwork = await getPersistedData<CkbNetwork>(
     snap,
-    "network",
-    BitcoinNetwork.Main
+    "ckbNetwork",
+    "mainnet"
   );
   if (!snapNetwork) {
-    await updatePersistedData(snap, "network", BitcoinNetwork.Main);
+    await updatePersistedData(snap, "ckbNetwork", "mainnet");
   }
   return snapNetwork;
 }
@@ -20,7 +20,7 @@ export async function manageNetwork(
   origin: string,
   snap: Snap,
   action: "get" | "set",
-  target?: BitcoinNetwork
+  target?: CkbNetwork
 ): Promise<string | void> {
   switch (action) {
     case "get":
@@ -39,7 +39,7 @@ export async function manageNetwork(
         },
       });
       if (result) {
-        await updatePersistedData(snap, "network", target);
+        await updatePersistedData(snap, "ckbNetwork", target);
         return target;
       } else {
         return "";

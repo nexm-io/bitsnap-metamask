@@ -1,12 +1,12 @@
 import { CkbAccount, CkbAccounts, CkbNetwork } from "../core/interface";
 import { getPersistedData, updatePersistedData } from "../../utils/manageState";
+import { Snap } from "../../interface";
+import { getCurrentNetwork } from "./network";
+import { heading, panel, text } from "@metamask/snaps-ui";
 import {
   extractAccountPrivateKey,
   generateAccountFromPrivateKey,
 } from "../utils/account";
-import { getCurrentNetwork } from "./network";
-import { heading, panel, text } from "@metamask/snaps-ui";
-import { Snap } from "../../interface";
 
 const DEFAULT_CKB_ACCOUNTS = {
   ["mainnet"]: [] as CkbAccount[],
@@ -77,13 +77,14 @@ const createNewSnapAccount = async (
   } = await extractAccountPrivateKey(snap, network, newIndex);
   const account = accountNode.neutered();
   const _account = generateAccountFromPrivateKey(
-    account.privateKey!.toString("hex")
+    account.privateKey!.toString("hex"),
+    network
   );
   const address = _account.address;
 
   const newCkbAccount: CkbAccount = {
     derivationPath: path,
-    pubKey: _account.pubKey,
+    pubKey: account.publicKey.toString("hex"),
     address,
     mfp: mfp,
   };

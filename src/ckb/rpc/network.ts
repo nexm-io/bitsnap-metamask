@@ -1,17 +1,17 @@
-import { CkbNetwork } from "../core/interface";
 import { getPersistedData, updatePersistedData } from "../../utils/manageState";
+import { Snap } from "../../interface";
 import { RequestErrors, SnapError } from "../../errors";
 import { heading, panel, text } from "@metamask/snaps-ui";
-import { Snap } from "../../interface";
+import { CkbNetwork } from "../core/interface";
 
-export async function getCurrentNetwork(snap: Snap) {
+export async function getCurrentNetwork(snap: Snap): Promise<CkbNetwork> {
   const snapNetwork: CkbNetwork = await getPersistedData<CkbNetwork>(
     snap,
     "ckbNetwork",
-    "mainnet"
+    CkbNetwork.Main
   );
   if (!snapNetwork) {
-    await updatePersistedData(snap, "ckbNetwork", "mainnet");
+    await updatePersistedData(snap, "ckbNetwork", CkbNetwork.Main);
   }
   return snapNetwork;
 }

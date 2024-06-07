@@ -1,34 +1,46 @@
 import BIP32Factory, { BIP32Interface } from "bip32";
 import { SLIP10Node, JsonSLIP10Node } from "@metamask/key-tree";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
-import { CkbAccount, CkbNetwork } from "ckb/core/interface";
+import { CkbAccount, CkbNetwork } from "../../ckb/core/interface";
 import { Snap } from "../../interface";
-import { Address, hd, helpers, Script } from "@ckb-lumos/lumos";
 import offCKB from "../core/offckb.config";
 import { RequestErrors, SnapError } from "../../errors";
+import { CKBHasher } from "./hasher";
+import { encodeToAddress } from "./helpers";
 
 export const CRYPTO_CURVE = "secp256k1";
 
 type Account = {
-  lockScript: Script;
-  address: Address;
+  address: string;
   pubKey: string;
 };
 
-export const generateAccountFromPrivateKey = (privKey: string): Account => {
-  const pubKey = hd.key.privateToPublic(privKey);
-  const args = hd.key.publicKeyToBlake160(pubKey);
-  const template = offCKB.lumosConfig.SCRIPTS["SECP256K1_BLAKE160"]!;
+export function publicKeyToBlake160(publicKey: string): string {
+  const blake160: string = new CKBHasher()
+    .update(publicKey)
+    .digestHex()
+    .slice(0, 42);
+
+  return blake160;
+}
+
+export const generateAccountFromPrivateKey = (
+  pubKey: string,
+  network: CkbNetwork
+): Account => {
+  const args = publicKeyToBlake160(pubKey);
+  const template = offCKB.lumosConfig(network).SCRIPTS["SECP256K1_BLAKE160"]!;
   const lockScript = {
     codeHash: template.CODE_HASH,
     hashType: template.HASH_TYPE,
     args: args,
   };
-  const address = helpers.encodeToAddress(lockScript, {
-    config: offCKB.lumosConfig,
+
+  const address = encodeToAddress(lockScript, {
+    config: offCKB.lumosConfig(network),
   });
+
   return {
-    lockScript,
     address,
     pubKey,
   };

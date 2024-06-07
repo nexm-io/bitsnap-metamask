@@ -1,8 +1,13 @@
 import { MetamaskBTCRpcRequest } from "./bitcoin/core/interface";
 import { MetamaskCKBRpcRequest } from "./ckb/core/interface";
-import { signPsbt, manageNetwork, signLNInvoice } from "./bitcoin/rpc";
+import {
+  signPsbt,
+  manageNetwork,
+  signLNInvoice,
+  addAccount,
+  getAccounts,
+} from "./bitcoin/rpc";
 import { SnapError, RequestErrors } from "./errors";
-import { addAccount, getAccounts } from "./bitcoin/rpc/account";
 import { initEccLib } from "bitcoinjs-lib";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import { signMessage } from "./bitcoin/rpc/signMessage";

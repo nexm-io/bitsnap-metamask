@@ -20,7 +20,6 @@ export interface GetCkbAccounts {
 
 export interface AddCkbAccount {
   method: "ckb_addAccount";
-  params: {};
 }
 
 export type MetamaskCKBRpcRequest =
@@ -34,7 +33,11 @@ export type CKBMethodCallback = (
   requestObject: MetamaskCKBRpcRequest
 ) => Promise<unknown>;
 
-export type CkbNetwork = "devnet" | "testnet" | "mainnet";
+export enum CkbNetwork {
+  Main = "mainnet",
+  Test = "testnet",
+  Dev = "devnet",
+}
 
 export type CkbAccount = {
   derivationPath: string[];

@@ -1,18 +1,18 @@
-import BN from 'bn.js';
-import { SnapError, InvoiceErrors } from '../errors';
+import BN from "bn.js";
+import { SnapError, InvoiceErrors } from "../../errors";
 
 const SATS_PER_BTC = new BN(1e8, 10);
 
-type BitcoinDivisor  = 'm' | 'u' | 'n' | 'p';
+type BitcoinDivisor = "m" | "u" | "n" | "p";
 
 const DIVISORS: Record<BitcoinDivisor, BN> = {
   m: new BN(1e3, 10),
   u: new BN(1e6, 10),
   n: new BN(1e9, 10),
-  p: new BN(1e12, 10)
+  p: new BN(1e12, 10),
 };
 
-export const hrpToSatoshi = (hrp: string):string => {
+export const hrpToSatoshi = (hrp: string): string => {
   let divisor, value;
   if (hrp.slice(-1).match(/^[munp]$/)) {
     divisor = hrp.slice(-1);
@@ -23,7 +23,7 @@ export const hrpToSatoshi = (hrp: string):string => {
     value = hrp;
   }
 
-  if (!value.match(/^\d+$/)){
+  if (!value.match(/^\d+$/)) {
     throw SnapError.of(InvoiceErrors.AmountNotValid);
   }
 

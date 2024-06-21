@@ -1,7 +1,8 @@
-import { BitcoinNetwork, Snap } from "../interface";
-import { getPersistedData, updatePersistedData } from "../utils/manageState";
-import { RequestErrors, SnapError } from "../errors";
+import { BitcoinNetwork } from "../core/interface";
+import { getPersistedData, updatePersistedData } from "../../utils/manageState";
+import { RequestErrors, SnapError } from "../../errors";
 import { heading, panel, text } from "@metamask/snaps-ui";
+import { Snap } from "../../interface";
 
 export async function getCurrentNetwork(snap: Snap) {
   const snapNetwork: BitcoinNetwork = await getPersistedData<BitcoinNetwork>(
@@ -29,12 +30,14 @@ export async function manageNetwork(
         method: "snap_dialog",
         params: {
           type: "confirmation",
-          content: panel([
-            heading("Switch your network"),
-            text(
-              `Do you want to allow ${origin} to switch network to ${target}?`
-            ),
-          ]),
+          content: panel({
+            children: [
+              heading("Switch your network"),
+              text(
+                `Do you want to allow ${origin} to switch network to ${target}?`
+              ),
+            ],
+          }),
         },
       });
       if (result) {

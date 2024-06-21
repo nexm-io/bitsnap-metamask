@@ -1,9 +1,9 @@
 import secp256k1 from "secp256k1";
 import { BIP32Interface } from "bip32";
 import { Signer, Psbt } from "bitcoinjs-lib";
-import { BitcoinNetwork } from "../interface";
-import { PsbtValidator } from "../bitcoin/PsbtValidator";
-import { PsbtHelper } from "../bitcoin/PsbtHelper";
+import { BitcoinNetwork } from "./interface";
+import { PsbtValidator } from "./PsbtValidator";
+import { PsbtHelper } from "./PsbtHelper";
 import { getNetwork } from "./getNetwork";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import { isTaprootInput } from "bitcoinjs-lib/src/psbt/bip371";

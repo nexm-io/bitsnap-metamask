@@ -1,5 +1,5 @@
-import { BitcoinNetwork, Snap } from "../interface";
-import { SnapError, RequestErrors } from "../errors";
+import { BitcoinNetwork } from "../core/interface";
+import { SnapError, RequestErrors } from "../../errors";
 import { heading, panel, text, divider } from "@metamask/snaps-ui";
 import { getPrivateKeyAsWIF } from "../utils/account";
 import { getCurrentNetwork } from "./network";
@@ -7,6 +7,7 @@ import { getAccounts } from "./account";
 import { Signer as Bip322Signer } from "bip322-js";
 import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
 import { encode } from "varuint-bitcoin";
+import { Snap } from "../../interface";
 
 function encodeVarString(b: Uint8Array) {
   return Buffer.concat([encode(b.byteLength), b]);
@@ -24,15 +25,19 @@ export async function signMessage(
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Sign Bitcoin Message"),
-        text(`Please verify this ongoing message from ${origin}`),
-        divider(),
-        panel([
-          text(`**Address**:\n ${signerAddress}`),
-          text(`**Message**:\n ${message}`),
-        ]),
-      ]),
+      content: panel({
+        children: [
+          heading({ value: "Sign Bitcoin Message" }),
+          text({ value: `Please verify this ongoing message from ${origin}` }),
+          divider(),
+          panel({
+            children: [
+              text({ value: `**Address**:\n ${signerAddress}` }),
+              text({ value: `**Message**:\n ${message}` }),
+            ],
+          }),
+        ],
+      }),
     },
   });
 

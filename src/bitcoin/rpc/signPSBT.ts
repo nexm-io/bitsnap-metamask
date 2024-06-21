@@ -1,11 +1,11 @@
-import { Snap } from "../interface";
-import { BtcTx } from "../bitcoin";
-import { SnapError, RequestErrors } from "../errors";
+import { BtcTx } from "../core";
+import { SnapError, RequestErrors } from "../../errors";
 import { heading, panel, text, divider } from "@metamask/snaps-ui";
 import { getSigner } from "../utils/account";
 import { getCurrentNetwork } from "./network";
 import { getAccounts } from "./account";
 import { Signer } from "bitcoinjs-lib";
+import { Snap } from "../../interface";
 
 export async function signPsbt(
   origin: string,
@@ -22,16 +22,18 @@ export async function signPsbt(
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Sign Bitcoin Transaction"),
-        text(`Please verify this ongoing Transaction from ${origin}`),
-        divider(),
-        panel(
-          Object.entries(txDetails).map(([key, value]) =>
-            text(`**${key}**:\n ${value}`)
-          )
-        ),
-      ]),
+      content: panel({
+        children: [
+          heading("Sign Bitcoin Transaction"),
+          text(`Please verify this ongoing Transaction from ${origin}`),
+          divider(),
+          panel({
+            children: Object.entries(txDetails).map(([key, value]) =>
+              text(`**${key}**:\n ${value}`)
+            ),
+          }),
+        ],
+      }),
     },
   });
 

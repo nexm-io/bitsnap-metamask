@@ -1,10 +1,10 @@
-import { Snap } from "../interface";
 import { transferInvoiceContent } from "../utils/transferLNData";
 import bitcoinMessage from "bitcoinjs-message";
-import { RequestErrors, SnapError } from "../errors";
+import { RequestErrors, SnapError } from "../../errors";
 import { divider, heading, panel, text } from "@metamask/snaps-ui";
 import { getPrivateKey } from "../utils/account";
 import { getAccounts } from "../rpc/account";
+import { Snap } from "../../interface";
 
 export async function signLNInvoice(
   domain: string,
@@ -17,16 +17,18 @@ export async function signLNInvoice(
     method: "snap_dialog",
     params: {
       type: "confirmation",
-      content: panel([
-        heading("Sign Lightning Transaction"),
-        text(`Please verify this ongoing transaction from ${domain}`),
-        divider(),
-        panel(
-          Object.entries(invoiceContent).map(([key, value]) =>
-            text(`**${key}**:\n ${value}`)
-          )
-        ),
-      ]),
+      content: panel({
+        children: [
+          heading("Sign Lightning Transaction"),
+          text(`Please verify this ongoing transaction from ${domain}`),
+          divider(),
+          panel({
+            children: Object.entries(invoiceContent).map(([key, value]) =>
+              text(`**${key}**:\n ${value}`)
+            ),
+          }),
+        ],
+      }),
     },
   });
 
